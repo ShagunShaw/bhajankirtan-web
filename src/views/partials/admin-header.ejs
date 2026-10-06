@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %> | Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin-body">
+<div class="admin-layout">
+  <aside class="sidebar">
+    <div class="brand">🕉️ BhajanKirtan</div>
+    <a href="/admin" class="<%= active === 'dashboard' ? 'active' : '' %>">Dashboard</a>
+    <a href="/admin/bookings" class="<%= active === 'bookings' ? 'active' : '' %>">Bookings</a>
+    <a href="/admin/performers" class="<%= active === 'performers' ? 'active' : '' %>">Performers</a>
+    <a href="/admin/packages" class="<%= active === 'packages' ? 'active' : '' %>">Packages</a>
+    <a href="/admin/pricing" class="<%= active === 'pricing' ? 'active' : '' %>">Pricing</a>
+    <a href="/admin/login">Logout</a>
+  </aside>
+  <main class="admin-main">

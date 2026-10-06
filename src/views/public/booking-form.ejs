@@ -1,0 +1,49 @@
+<%- include('../partials/header', { title }) %>
+<div class="page-banner"><div class="container"><h1>Request a Booking</h1></div></div>
+
+<section class="section">
+  <div class="container">
+    <form class="form-card" method="POST" action="/book">
+      <div class="summary-bar">
+        Booking request for <strong><%= performer.name %></strong> (from ₹<%= performer.price.toLocaleString('en-IN') %>)
+      </div>
+      <input type="hidden" name="performerId" value="<%= performer.id %>">
+
+      <div class="form-row">
+        <div class="field"><label>Your name</label><input type="text" name="name" required></div>
+        <div class="field"><label>Phone (WhatsApp)</label><input type="tel" name="phone" required></div>
+      </div>
+      <div class="field"><label>Email</label><input type="email" name="email" required></div>
+
+      <div class="form-row">
+        <div class="field">
+          <label>Event type</label>
+          <select name="event" required>
+            <% performer.events.forEach(e => { %><option><%= e %></option><% }) %>
+          </select>
+        </div>
+        <div class="field">
+          <label>Package</label>
+          <select name="package">
+            <option value="">No package</option>
+            <% packages.forEach(p => { %><option><%= p.name %></option><% }) %>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="field"><label>Event date</label><input type="date" name="date" required></div>
+        <div class="field"><label>Event time</label><input type="time" name="time" required></div>
+      </div>
+
+      <div class="form-row">
+        <div class="field"><label>Event location / address</label><input type="text" name="location" required></div>
+        <div class="field"><label>Expected guests</label><input type="number" name="guests" min="1"></div>
+      </div>
+
+      <div class="field"><label>Additional notes</label><textarea name="notes"></textarea></div>
+      <button class="btn" type="submit">Send Request</button>
+    </form>
+  </div>
+</section>
+<%- include('../partials/footer') %>

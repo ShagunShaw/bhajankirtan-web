@@ -1,0 +1,29 @@
+<%- include('../partials/admin-header', { title, active }) %>
+<h1>Packages</h1>
+
+<div class="card-grid">
+  <% packages.forEach(pk => { %>
+    <div class="panel">
+      <h2><%= pk.name %></h2>
+      <p class="price"><%= pk.price %></p>
+      <ul style="margin-bottom:14px;">
+        <% pk.features.forEach(f => { %><li>✓ <%= f %></li><% }) %>
+      </ul>
+      <button class="btn-xs">Edit</button>
+      <button class="btn-xs red">Delete</button>
+    </div>
+  <% }) %>
+</div>
+
+<div class="panel">
+  <h2>Add Package</h2>
+  <form class="admin-form" method="POST" action="#">
+    <div class="form-row">
+      <div class="field"><label>Package name</label><input type="text" name="name" required></div>
+      <div class="field"><label>Starting price (₹)</label><input type="number" name="price" required></div>
+    </div>
+    <div class="field"><label>What is included (one per line)</label><textarea name="features"></textarea></div>
+    <button class="btn" type="submit">Add Package</button>
+  </form>
+</div>
+<%- include('../partials/admin-footer') %>

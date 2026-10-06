@@ -1,0 +1,24 @@
+<%- include('../partials/header', { title }) %>
+<div class="page-banner"><div class="container"><h1>Booking Status</h1></div></div>
+
+<section class="section">
+  <div class="container">
+    <div class="form-card">
+      <% if (isNew) { %>
+        <div class="success-box">Your request has been sent. We will confirm availability and update you by email and WhatsApp.</div>
+      <% } %>
+      <h2>Booking <%= booking.ref %></h2>
+      <p style="margin-top:8px;"><span class="status-badge status-<%= booking.status.toLowerCase() %>"><%= booking.status %></span></p>
+
+      <div class="detail-list">
+        <div><span>Event</span><span><%= booking.event %></span></div>
+        <div><span>Performer</span><span><%= booking.performer %></span></div>
+        <div><span>Date</span><span><%= booking.date %></span></div>
+        <div><span>Time</span><span><%= booking.time %></span></div>
+        <div><span>Location</span><span><%= booking.location %></span></div>
+        <div><span>Guests</span><span><%= booking.guests %></span></div>
+      </div>
+    </div>
+  </div>
+</section>
+<%- include('../partials/footer') %>

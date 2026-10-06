@@ -1,0 +1,18 @@
+<%- include('../partials/header', { title }) %>
+<div class="page-banner"><div class="container"><h1>Contact Us</h1></div></div>
+
+<section class="section">
+  <div class="container">
+    <form class="form-card" method="POST" action="/contact">
+      <% if (sent) { %><div class="success-box">Thank you. We will get back to you soon.</div><% } %>
+      <div class="form-row">
+        <div class="field"><label>Name</label><input type="text" name="name" required></div>
+        <div class="field"><label>Phone</label><input type="tel" name="phone" required></div>
+      </div>
+      <div class="field"><label>Email</label><input type="email" name="email"></div>
+      <div class="field"><label>Message</label><textarea name="message" required></textarea></div>
+      <button class="btn" type="submit">Send Message</button>
+    </form>
+  </div>
+</section>
+<%- include('../partials/footer') %>

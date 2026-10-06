@@ -1,0 +1,44 @@
+<%- include('../partials/header', { title }) %>
+<div class="page-banner"><div class="container"><h1><%= performer.name %></h1></div></div>
+
+<section class="section">
+  <div class="container profile">
+    <div class="profile-main">
+      <div class="profile-head">
+        <div class="avatar"><%= performer.name.charAt(0) %></div>
+        <div>
+          <h2><%= performer.name %></h2>
+          <p class="muted">📍 <%= performer.city %> &nbsp;|&nbsp; <%= performer.experience %> years experience</p>
+        </div>
+      </div>
+
+      <div class="tags">
+        <% performer.events.forEach(e => { %><span class="tag"><%= e %></span><% }) %>
+      </div>
+
+      <h3>About</h3>
+      <p><%= performer.bio %></p>
+
+      <h3>Sample Audio / Video</h3>
+      <div class="media-row">
+        <div class="media-box">Sample 1</div>
+        <div class="media-box">Sample 2</div>
+        <div class="media-box">Sample 3</div>
+      </div>
+
+      <h3>Past Events</h3>
+      <p class="muted">Past event details will appear here.</p>
+    </div>
+
+    <aside class="side-box">
+      <p class="muted">Starting price</p>
+      <p class="price">₹<%= performer.price.toLocaleString('en-IN') %></p>
+      <% peakPrices.forEach(pk => { %>
+        <div class="peak-note"><strong><%= pk.label %></strong> (<%= pk.from %> to <%= pk.to %>): ₹<%= pk.price.toLocaleString('en-IN') %></div>
+      <% }) %>
+      <a href="/book/<%= performer.id %>" class="btn">Request Booking</a>
+      <p class="muted" style="font-size:.85rem;margin-top:10px;">Booking is confirmed only after availability is checked.</p>
+    </aside>
+  </div>
+</section>
+<%- include('../partials/footer') %>

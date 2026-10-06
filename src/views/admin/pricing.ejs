@@ -1,0 +1,50 @@
+<%- include('../partials/admin-header', { title, active }) %>
+<h1>Pricing</h1>
+
+<div class="panel">
+  <h2>Peak Season Prices</h2>
+  <p class="muted" style="margin-bottom:12px;">During these dates, the peak price replaces the normal base price automatically.</p>
+  <table>
+    <tr><th>Label</th><th>From</th><th>To</th><th>Peak price</th><th>Actions</th></tr>
+    <% peakPrices.forEach(pk => { %>
+      <tr>
+        <td><%= pk.label %></td>
+        <td><%= pk.from %></td>
+        <td><%= pk.to %></td>
+        <td>₹<%= pk.price.toLocaleString('en-IN') %></td>
+        <td><button class="btn-xs">Edit</button> <button class="btn-xs red">Delete</button></td>
+      </tr>
+    <% }) %>
+  </table>
+</div>
+
+<div class="panel">
+  <h2>Add Peak Period</h2>
+  <form class="admin-form" method="POST" action="#">
+    <div class="form-row">
+      <div class="field"><label>Label</label><input type="text" name="label" placeholder="e.g. Navratri" required></div>
+      <div class="field"><label>From</label><input type="date" name="from" required></div>
+      <div class="field"><label>To</label><input type="date" name="to" required></div>
+      <div class="field"><label>Peak price (₹)</label><input type="number" name="price" required></div>
+    </div>
+    <div class="field">
+      <label>Applies to</label>
+      <select name="performerId">
+        <option value="">All performers</option>
+        <% performers.forEach(p => { %><option value="<%= p.id %>"><%= p.name %></option><% }) %>
+      </select>
+    </div>
+    <button class="btn" type="submit">Add Peak Period</button>
+  </form>
+</div>
+
+<div class="panel">
+  <h2>Base Prices</h2>
+  <table>
+    <tr><th>Performer</th><th>Base price</th><th>Action</th></tr>
+    <% performers.forEach(p => { %>
+      <tr><td><%= p.name %></td><td>₹<%= p.price.toLocaleString('en-IN') %></td><td><button class="btn-xs">Edit</button></td></tr>
+    <% }) %>
+  </table>
+</div>
+<%- include('../partials/admin-footer') %>

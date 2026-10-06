@@ -1,0 +1,44 @@
+<%- include('../partials/header', { title }) %>
+<div class="page-banner"><div class="container"><h1>Find Performers</h1></div></div>
+
+<section class="section">
+  <div class="container listing">
+    <form class="filter-box" method="GET" action="/performers">
+      <h3>Filters</h3>
+      <div class="field">
+        <label>Event type</label>
+        <select name="event">
+          <option value="">All</option>
+          <% categories.forEach(c => { %>
+            <option value="<%= c.name %>" <%= q.event === c.name ? 'selected' : '' %>><%= c.name %></option>
+          <% }) %>
+        </select>
+      </div>
+      <div class="field"><label>City</label><input type="text" name="city" value="<%= q.city %>" placeholder="e.g. Bhubaneswar"></div>
+      <div class="field"><label>Event date</label><input type="date" name="date" value="<%= q.date %>"></div>
+      <div class="field"><label>Max budget (₹)</label><input type="number" name="maxPrice" value="<%= q.maxPrice %>" placeholder="e.g. 5000"></div>
+      <button class="btn" type="submit">Apply Filters</button>
+    </form>
+
+    <div>
+      <p class="result-count"><%= performers.length %> performer(s) found</p>
+      <% if (performers.length === 0) { %>
+        <div class="empty">No performers match your search. Try changing the filters.</div>
+      <% } else { %>
+        <div class="card-grid">
+          <% performers.forEach(p => { %>
+            <div class="performer-card">
+              <div class="avatar"><%= p.name.charAt(0) %></div>
+              <h3><%= p.name %></h3>
+              <p class="muted"><%= p.speciality %></p>
+              <p class="meta">📍 <%= p.city %> &nbsp;|&nbsp; <%= p.experience %> yrs</p>
+              <p class="price">From ₹<%= p.price.toLocaleString('en-IN') %></p>
+              <a href="/performers/<%= p.id %>" class="btn btn-outline">View Profile</a>
+            </div>
+          <% }) %>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</section>
+<%- include('../partials/footer') %>

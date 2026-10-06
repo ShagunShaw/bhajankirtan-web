@@ -1,0 +1,30 @@
+<%- include('../partials/admin-header', { title, active }) %>
+<h1>Bookings</h1>
+
+<table>
+  <tr><th>Ref</th><th>Customer</th><th>Event</th><th>Date / Time</th><th>Performer</th><th>Status</th><th>Actions</th></tr>
+  <% bookings.forEach(b => { %>
+    <tr>
+      <td><%= b.ref %></td>
+      <td><%= b.customer %><br><small><%= b.phone %></small></td>
+      <td><%= b.event %></td>
+      <td><%= b.date %><br><small><%= b.time %></small></td>
+      <td><%= b.performer %></td>
+      <td><span class="status-badge status-<%= b.status.toLowerCase() %>"><%= b.status %></span></td>
+      <td>
+        <form method="POST" action="#" style="display:flex;gap:6px;flex-wrap:wrap;">
+          <select name="performerId" style="padding:4px;">
+            <% performers.forEach(p => { %><option value="<%= p.id %>"><%= p.name %></option><% }) %>
+          </select>
+          <% if (b.status === 'Requested') { %>
+            <button class="btn-xs green" type="button">Confirm</button>
+            <button class="btn-xs red" type="button">Reject</button>
+          <% } else { %>
+            <button class="btn-xs grey" type="button">Reallot</button>
+          <% } %>
+        </form>
+      </td>
+    </tr>
+  <% }) %>
+</table>
+<%- include('../partials/admin-footer') %>

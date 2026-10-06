@@ -1,0 +1,47 @@
+<%- include('../partials/admin-header', { title, active }) %>
+<h1>Dashboard</h1>
+
+<div class="stat-grid">
+  <div class="stat"><strong><%= stats.total %></strong>Total bookings</div>
+  <div class="stat"><strong><%= stats.pending %></strong>Pending requests</div>
+  <div class="stat"><strong><%= stats.upcoming %></strong>Upcoming confirmed</div>
+</div>
+
+<div class="panel-grid">
+  <div class="panel today">
+    <h2>📅 Today's Events (<%= today.length %>)</h2>
+    <% if (today.length === 0) { %><p class="muted">No events today.</p><% } %>
+    <% today.forEach(b => { %>
+      <div class="reminder">
+        <div class="row"><strong><%= b.event %> at <%= b.time %></strong><span><%= b.ref %></span></div>
+        <div>Performer: <%= b.performer %></div>
+        <div>Customer: <%= b.customer %> (<%= b.phone %>)</div>
+        <div>📍 <%= b.location %></div>
+        <div class="actions">
+          <a class="btn-xs" href="tel:<%= b.phone %>">Call customer</a>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+
+  <div class="panel tomorrow">
+    <h2>⏰ Tomorrow's Events (<%= tomorrow.length %>)</h2>
+    <% if (tomorrow.length === 0) { %><p class="muted">No events tomorrow.</p><% } %>
+    <% tomorrow.forEach(b => { %>
+      <div class="reminder <%= b.reconfirmed ? '' : 'warn' %>">
+        <div class="row">
+          <strong><%= b.event %> at <%= b.time %></strong>
+          <span class="pill <%= b.reconfirmed ? 'yes' : 'no' %>"><%= b.reconfirmed ? 'Reconfirmed' : 'Not reconfirmed' %></span>
+        </div>
+        <div>Performer: <%= b.performer %></div>
+        <div>Customer: <%= b.customer %> (<%= b.phone %>)</div>
+        <div>📍 <%= b.location %></div>
+        <div class="actions">
+          <button class="btn-xs green">Mark reconfirmed</button>
+          <a class="btn-xs grey" href="/admin/bookings">Reallot</a>
+        </div>
+      </div>
+    <% }) %>
+  </div>
+</div>
+<%- include('../partials/admin-footer') %>
