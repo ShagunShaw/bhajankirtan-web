@@ -45,3 +45,7 @@ th { background: var(--cream); color: var(--maroon); }
   .sidebar a { padding: 8px 14px; }
   .panel-grid { grid-template-columns: 1fr; }
 }
+
+.fab { position: fixed; right: 30px; bottom: 30px; background: var(--saffron); color: var(--white); padding: 14px 24px; border-radius: 40px; font-weight: 600; box-shadow: 0 6px 18px rgba(0,0,0,0.25); z-index: 20; }
+.fab:hover { background: var(--maroon); }
+.admin-form input[type="file"] { padding: 8px; background: var(--white); }

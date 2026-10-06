@@ -1,26 +1,6 @@
 <%- include('../partials/admin-header', { title, active }) %>
 <h1>Performers</h1>
 
-<div class="panel">
-  <h2>Add New Performer</h2>
-  <form class="admin-form" method="POST" action="#">
-    <div class="form-row">
-      <div class="field"><label>Name</label><input type="text" name="name" required></div>
-      <div class="field"><label>City</label><input type="text" name="city" required></div>
-      <div class="field"><label>Experience (years)</label><input type="number" name="experience"></div>
-      <div class="field"><label>Base price (₹)</label><input type="number" name="price" required></div>
-    </div>
-    <div class="field">
-      <label>Event types</label>
-      <select name="events" multiple>
-        <% categories.forEach(c => { %><option><%= c.name %></option><% }) %>
-      </select>
-    </div>
-    <div class="field"><label>About</label><textarea name="bio"></textarea></div>
-    <button class="btn" type="submit">Add Performer</button>
-  </form>
-</div>
-
 <table>
   <tr><th>Name</th><th>Events</th><th>City</th><th>Base price</th><th>Visible</th><th>Actions</th></tr>
   <% performers.forEach(p => { %>
@@ -38,4 +18,6 @@
     </tr>
   <% }) %>
 </table>
+
+<a href="/admin/performers/new" class="fab">+ Add Performer</a>
 <%- include('../partials/admin-footer') %>

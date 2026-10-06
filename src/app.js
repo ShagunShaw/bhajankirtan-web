@@ -64,7 +64,18 @@ app.get('/admin', (req, res) => {
 });
 
 app.get('/admin/performers', (req, res) => res.render('admin/performers', { title: 'Performers', active: 'performers', performers, categories }));
-app.get('/admin/bookings', (req, res) => res.render('admin/bookings', { title: 'Bookings', active: 'bookings', bookings, performers }));
+app.get('/admin/bookings', (req, res) => {
+  const sorted = [...bookings].sort((a, b) => {
+    if (a.status === b.status) return a.date.localeCompare(b.date);
+    return a.status === 'Requested' ? -1 : 1;
+  });
+  res.render('admin/bookings', { title: 'Bookings', active: 'bookings', bookings: sorted, performers });
+});
+
+app.get('/admin/performers/new', (req, res) =>
+  res.render('admin/performer-new', { title: 'Add Performer', active: 'performers', categories })
+);
+app.post('/admin/performers/new', (req, res) => res.redirect('/admin/performers'));
 app.get('/admin/packages', (req, res) => res.render('admin/packages', { title: 'Packages', active: 'packages', packages }));
 app.get('/admin/pricing', (req, res) => res.render('admin/pricing', { title: 'Pricing', active: 'pricing', performers, peakPrices }));
 

@@ -1,0 +1,37 @@
+<%- include('../partials/admin-header', { title, active }) %>
+<h1>Add Performer</h1>
+
+<div class="panel">
+  <form class="admin-form" method="POST" action="/admin/performers/new" enctype="multipart/form-data">
+    <div class="form-row">
+      <div class="field"><label>Name</label><input type="text" name="name" required></div>
+      <div class="field"><label>City</label><input type="text" name="city" required></div>
+      <div class="field"><label>Experience (years)</label><input type="number" name="experience"></div>
+      <div class="field"><label>Base price (₹)</label><input type="number" name="price" required></div>
+    </div>
+
+    <div class="field">
+      <label>Event types (hold Ctrl / Cmd to select multiple)</label>
+      <select name="events" multiple>
+        <% categories.forEach(c => { %><option><%= c.name %></option><% }) %>
+      </select>
+    </div>
+
+    <div class="field"><label>About</label><textarea name="bio"></textarea></div>
+
+    <h2 style="margin-top:20px;">Photos</h2>
+    <div class="form-row">
+      <div class="field"><label>Performer photo (profile)</label><input type="file" name="profileImage" accept="image/*" required></div>
+    </div>
+    <div class="form-row">
+      <div class="field"><label>Work photo 1</label><input type="file" name="work1" accept="image/*"></div>
+      <div class="field"><label>Work photo 2</label><input type="file" name="work2" accept="image/*"></div>
+      <div class="field"><label>Work photo 3</label><input type="file" name="work3" accept="image/*"></div>
+      <div class="field"><label>Work photo 4</label><input type="file" name="work4" accept="image/*"></div>
+    </div>
+
+    <button class="btn" type="submit">Save Performer</button>
+    <a href="/admin/performers" class="btn btn-outline" style="margin-left:8px;">Cancel</a>
+  </form>
+</div>
+<%- include('../partials/admin-footer') %>

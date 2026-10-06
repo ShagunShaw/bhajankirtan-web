@@ -15,11 +15,9 @@
       <div class="reminder">
         <div class="row"><strong><%= b.event %> at <%= b.time %></strong><span><%= b.ref %></span></div>
         <div>Performer: <%= b.performer %></div>
-        <div>Customer: <%= b.customer %> (<%= b.phone %>)</div>
+        <div>Customer: <%= b.customer %></div>
+        <div>📞 Customer phone: <strong><%= b.phone %></strong></div>
         <div>📍 <%= b.location %></div>
-        <div class="actions">
-          <a class="btn-xs" href="tel:<%= b.phone %>">Call customer</a>
-        </div>
       </div>
     <% }) %>
   </div>
