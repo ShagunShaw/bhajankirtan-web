@@ -1,0 +1,82 @@
+<%- include('../partials/header', { title }) %>
+
+<section class="hero">
+  <div class="container">
+    <h1>Book the Right Performer for Your Devotional Event</h1>
+    <p>Jagrata, Mata Ki Chowki, Rudra Abhishek and more. Find, compare and book in minutes.</p>
+    <form class="search-box" action="/performers" method="GET">
+      <select name="event">
+        <option value="">Event type</option>
+        <% categories.forEach(c => { %>
+          <option value="<%= c.name %>"><%= c.name %></option>
+        <% }) %>
+      </select>
+      <input type="text" name="city" placeholder="City">
+      <input type="date" name="date">
+      <button type="submit" class="btn">Search</button>
+    </form>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2 class="section-title">Browse by Event</h2>
+    <div class="category-grid">
+      <% categories.forEach(c => { %>
+        <a href="/performers?event=<%= encodeURIComponent(c.name) %>" class="category-card">
+          <span class="category-icon"><%= c.icon %></span>
+          <span><%= c.name %></span>
+        </a>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt">
+  <div class="container">
+    <h2 class="section-title">Featured Performers</h2>
+    <div class="card-grid">
+      <% performers.forEach(p => { %>
+        <div class="performer-card">
+          <div class="avatar"><%= p.name.charAt(0) %></div>
+          <h3><%= p.name %></h3>
+          <p class="muted"><%= p.speciality %></p>
+          <p class="meta">📍 <%= p.city %> &nbsp;|&nbsp; <%= p.experience %> yrs experience</p>
+          <p class="price">From ₹<%= p.price.toLocaleString('en-IN') %></p>
+          <a href="/performers/<%= p.id %>" class="btn btn-outline">View Profile</a>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="how">
+  <div class="container">
+    <h2 class="section-title">How It Works</h2>
+    <div class="steps">
+      <div class="step"><span>1</span><h4>Search</h4><p>Choose event type, city and date.</p></div>
+      <div class="step"><span>2</span><h4>Request</h4><p>Pick a performer and send a booking request.</p></div>
+      <div class="step"><span>3</span><h4>Confirmation</h4><p>We confirm availability and update you by email and WhatsApp.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section section-alt" id="packages">
+  <div class="container">
+    <h2 class="section-title">Our Packages</h2>
+    <div class="card-grid">
+      <% packages.forEach(pk => { %>
+        <div class="package-card <%= pk.featured ? 'featured' : '' %>">
+          <h3><%= pk.name %></h3>
+          <p class="price"><%= pk.price %></p>
+          <ul>
+            <% pk.features.forEach(f => { %><li>✓ <%= f %></li><% }) %>
+          </ul>
+          <a href="/performers" class="btn">Choose <%= pk.name %></a>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>
