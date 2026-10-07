@@ -1,3 +1,9 @@
 • link performer to many tags
 • Database ka configuration create krna baki h, only models create hua h
 • yh sbko 'module.js' format mei likho
+• Admin pe datas manually add kro, be it 1st, 2nd or 3rd admin
+
+• aacha i can do it like this na, make admin model as it is, but instead of hard coding my admin in the mongodb atlas gui, I hard seed it from my postman. in this way, the bcrypt function will hash my password and from then everytime the user will login, it will use the same credentials. Also to ensure consistency i will use the same db url for both hardcoding my admin and for production  ----->>>>   Once you have seeded your initial admin account using Postman, you should either comment out/remove the code for that admin creation route or secure it behind an environment variable check. If left open in production without restrictions, anyone who finds that endpoint could register themselves as an admin. You can use this env also if (process.env.DEV == 'developement')
+
+• Use 'isPasswordCorrect' method (defined in admin model) to check if the admin entered password is correct or not
+• Access and Refresh token for our admin will be created later
