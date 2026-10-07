@@ -1,3 +1,6 @@
+// Database ka configuration create krna baki h, only models create hua h
+// yh sbko 'module.js' format mei likho
+
 const express = require('express');
 const path = require('path');
 const { iso, categories, performers, packages, peakPrices, bookings, getPrice } = require('./data/mockData');

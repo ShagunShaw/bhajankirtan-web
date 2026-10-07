@@ -19,19 +19,79 @@
 
     <div class="field"><label>About</label><textarea name="bio"></textarea></div>
 
-    <h2 style="margin-top:20px;">Photos</h2>
-    <div class="form-row">
-      <div class="field"><label>Performer photo (profile)</label><input type="file" name="profileImage" accept="image/*" required></div>
+        <h2 style="margin-top:20px;">Photos & Videos (all optional)</h2>
+
+    <div class="field">
+      <label>Performer photo (profile, max 3 MB)</label>
+      <input type="file" id="profileImage" name="profileImage" accept="image/*">
     </div>
-    <div class="form-row">
-      <div class="field"><label>Work photo 1</label><input type="file" name="work1" accept="image/*"></div>
-      <div class="field"><label>Work photo 2</label><input type="file" name="work2" accept="image/*"></div>
-      <div class="field"><label>Work photo 3</label><input type="file" name="work3" accept="image/*"></div>
-      <div class="field"><label>Work photo 4</label><input type="file" name="work4" accept="image/*"></div>
+
+    <div class="field">
+      <label>Work photos (up to 10 images, max 5 MB each)</label>
+      <input type="file" id="workImages" name="workImages" accept="image/*" multiple>
+      <div id="mediaList" class="media-list"></div>
     </div>
+
+    <div class="field">
+      <label>YouTube video links</label>
+      <div id="linkBox">
+        <input type="url" name="videoLinks" placeholder="https://www.youtube.com/watch?v=..." style="margin-bottom:8px;">
+      </div>
+      <button type="button" class="btn-xs" id="addLink">+ Add another link</button>
+    </div>
+
+    <p id="mediaError" style="color:#c0392b;font-size:.9rem;margin-bottom:12px;"></p>
 
     <button class="btn" type="submit">Save Performer</button>
     <a href="/admin/performers" class="btn btn-outline" style="margin-left:8px;">Cancel</a>
   </form>
 </div>
+
+<script>
+  const MB = 1024 * 1024;
+  const profile = document.getElementById('profileImage');
+  const work = document.getElementById('workImages');
+  const list = document.getElementById('mediaList');
+  const error = document.getElementById('mediaError');
+
+  profile.addEventListener('change', () => {
+    error.textContent = '';
+    if (profile.files[0] && profile.files[0].size > 3 * MB) {
+      error.textContent = 'Profile photo is over 3 MB. Please choose a smaller one.';
+      profile.value = '';
+    }
+  });
+
+  work.addEventListener('change', () => {
+    list.innerHTML = '';
+    error.textContent = '';
+    const files = Array.from(work.files);
+
+    if (files.length > 10) {
+      error.textContent = 'You can upload at most 10 work images.';
+      work.value = '';
+      return;
+    }
+    const big = files.filter(f => f.size > 5 * MB).map(f => f.name);
+    if (big.length) {
+      error.textContent = 'Over 5 MB: ' + big.join(', ') + '. Please select again.';
+      work.value = '';
+      return;
+    }
+    files.forEach(f => {
+      const row = document.createElement('div');
+      row.textContent = f.name + ' (' + (f.size / MB).toFixed(1) + ' MB)';
+      list.appendChild(row);
+    });
+  });
+
+  document.getElementById('addLink').addEventListener('click', () => {
+    const input = document.createElement('input');
+    input.type = 'url';
+    input.name = 'videoLinks';
+    input.placeholder = 'https://www.youtube.com/watch?v=...';
+    input.style.marginBottom = '8px';
+    document.getElementById('linkBox').appendChild(input);
+  });
+</script>
 <%- include('../partials/admin-footer') %>
