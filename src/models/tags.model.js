@@ -1,8 +1,22 @@
-import mongoose from "mongoose";
-import { Schema } from "mongoose";
+import mongoose, { Schema } from "mongoose";
 
-const tagsSchema = new Schema({
+export const normalizeTag = (v) =>
+  typeof v === "string" ? v.trim().toLowerCase().replace(/\s+/g, " ") : v;
 
-})
+const tagSchema = new Schema(
+  {
+    name: { 
+        type: String, 
+        required: true, 
+        unique: true, 
+        minlength: 2, 
+        maxlength: 40, 
+        set: normalizeTag },
+    displayName: { 
+        type: String, 
+        trim: true, 
+        maxlength: 40 } // original casing for showing to users
+  }
+);
 
-export const Tags = mongoose.model('Tags', tagsSchema)
+export const Tag = mongoose.model("Tag", tagSchema);

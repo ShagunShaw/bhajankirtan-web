@@ -1,0 +1,3 @@
+• link performer to many tags
+• Database ka configuration create krna baki h, only models create hua h
+• yh sbko 'module.js' format mei likho

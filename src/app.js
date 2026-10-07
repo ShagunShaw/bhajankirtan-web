@@ -1,9 +1,9 @@
-// Database ka configuration create krna baki h, only models create hua h
-// yh sbko 'module.js' format mei likho
+import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import { iso, categories, performers, packages, peakPrices, bookings } from './data/mockData.js';
 
-const express = require('express');
-const path = require('path');
-const { iso, categories, performers, packages, peakPrices, bookings, getPrice } = require('./data/mockData');
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 app.set('view engine', 'ejs');
@@ -66,7 +66,15 @@ app.get('/admin', (req, res) => {
   res.render('admin/dashboard', { title: 'Dashboard', active: 'dashboard', today, tomorrow, stats });
 });
 
-app.get('/admin/performers', (req, res) => res.render('admin/performers', { title: 'Performers', active: 'performers', performers, categories }));
+app.get('/admin/performers', (req, res) =>
+  res.render('admin/performers', { title: 'Performers', active: 'performers', performers, categories })
+);
+
+app.get('/admin/performers/new', (req, res) =>
+  res.render('admin/performer-new', { title: 'Add Performer', active: 'performers', categories })
+);
+app.post('/admin/performers/new', (req, res) => res.redirect('/admin/performers'));
+
 app.get('/admin/bookings', (req, res) => {
   const sorted = [...bookings].sort((a, b) => {
     if (a.status === b.status) return a.date.localeCompare(b.date);
@@ -75,10 +83,6 @@ app.get('/admin/bookings', (req, res) => {
   res.render('admin/bookings', { title: 'Bookings', active: 'bookings', bookings: sorted, performers });
 });
 
-app.get('/admin/performers/new', (req, res) =>
-  res.render('admin/performer-new', { title: 'Add Performer', active: 'performers', categories })
-);
-app.post('/admin/performers/new', (req, res) => res.redirect('/admin/performers'));
 app.get('/admin/packages', (req, res) => res.render('admin/packages', { title: 'Packages', active: 'packages', packages }));
 app.get('/admin/pricing', (req, res) => res.render('admin/pricing', { title: 'Pricing', active: 'pricing', performers, peakPrices }));
 
