@@ -7,3 +7,5 @@
 
 • Use 'isPasswordCorrect' method (defined in admin model) to check if the admin entered password is correct or not
 • Access and Refresh token for our admin will be created later
+• 'City' will not be there in performer field
+• We will give an option for customers to search by tags/artist_names

@@ -5,17 +5,19 @@ export const normalizeTag = (v) =>
 
 const tagSchema = new Schema(
   {
-    name: { 
-        type: String, 
-        required: true, 
-        unique: true, 
-        minlength: 2, 
-        maxlength: 40, 
-        set: normalizeTag },
-    displayName: { 
-        type: String, 
-        trim: true, 
-        maxlength: 40 } // original casing for showing to users
+    name: {
+      type: String,
+      required: true,
+      unique: true,
+      minlength: 2,
+      maxlength: 40,
+      set: normalizeTag
+    },
+    displayName: {    // original casing for showing to users 
+      type: String,
+      trim: true,
+      maxlength: 40
+    }
   }
 );
 
