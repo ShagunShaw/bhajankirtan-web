@@ -9,3 +9,13 @@
 • Access and Refresh token for our admin will be created later
 • 'City' will not be there in performer field
 • We will give an option for customers to search by tags/artist_names
+
+• Ques) aacha now tell me, will dispaying any performer price for a particular date, how will be check if there is any peak price for him or should be just display the base price. like then it will be toh 2 db calls na, one to the peak price model, id not found then to the base price model. So what will be our flow    --------->>>>>>>>>   It’s not two calls, because the base price is already stored on the performer record (basePrice). You load the performer anyway to show their profile, so the only extra query is the peak-price check.
+
+Flow for a price on a specific date
+
+Load the performer (you already have basePrice).
+Query PeakPrice once: this performer, where from <= date <= to.
+If a record comes back, the price is peakPrice. If not, it’s basePrice.
+
+That’s one extra query, and your compound index makes it fast. Put this logic in one function (the pricingService.js from our folder structure) and use it everywhere, so the price is never calculated in two different ways.
