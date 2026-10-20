@@ -4,6 +4,12 @@ Also ask the client ki cutomer ka toh pura detail unko mil jayega, lkin unko con
 import mongoose, { Schema } from "mongoose";
 
 const bookingSchema = new Schema({
+    referenceId: {
+        type: String,
+        required: true,
+        unique: true,
+        index: true
+    },
     customerName: {
 
     },
