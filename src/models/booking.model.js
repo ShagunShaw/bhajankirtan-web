@@ -1,4 +1,5 @@
 Also refund, reconfirmation and re-allotment wala part kaise handle krna h look at that too
+Also ask the client ki cutomer ka toh pura detail unko mil jayega, lkin unko contact back kaise karega
 
 import mongoose, { Schema } from "mongoose";
 
@@ -38,6 +39,9 @@ const bookingSchema = new Schema({
     },
     isBookingConfirmed: {
         index: true
+    },
+    isBookingReConfirmed: {
+        
     },
     amount: {       // making it optional for now, as I need to verify from the client, whether price are fixed or can be negotiable via call
 
