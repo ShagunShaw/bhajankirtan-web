@@ -44,10 +44,13 @@ const bookingSchema = new Schema({
 
     },
     isBookingConfirmed: {
-        index: true
+        index: true,        check this once, shyd yha pe 'index' ni lagana hoga hmlog ko
+        enum: ["Yes", "No", "Rejected"],
+        default: "No"
     },
     isBookingReConfirmed: {
-        
+        enum: ["Yes", "No"],
+        default: "No"
     },
     amount: {       // making it optional for now, as I need to verify from the client, whether price are fixed or can be negotiable via call
 
