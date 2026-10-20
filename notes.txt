@@ -19,3 +19,8 @@ Query PeakPrice once: this performer, where from <= date <= to.
 If a record comes back, the price is peakPrice. If not, it’s basePrice.
 
 That’s one extra query, and your compound index makes it fast. Put this logic in one function (the pricingService.js from our folder structure) and use it everywhere, so the price is never calculated in two different ways.
+
+
+• Ask client ki booking request k time pe hi price fixed rahega ya phir negotiate krke price differ bhi ho skta h, for 'booking.model.js' file
+
+•• Also refund, reconfirmation and re-allotment wala part kaise handle krna h look at that too
