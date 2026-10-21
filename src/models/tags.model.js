@@ -5,20 +5,21 @@ export const normalizeTag = (v) =>
 
 const tagSchema = new Schema(
   {
-    name: {
-      type: String,
-      required: true,
-      unique: true,
-      minlength: 2,
-      maxlength: 40,
-      set: normalizeTag
+    name: { 
+      type: String, 
+      required: true, 
+      unique: true, 
+      minlength: 2, 
+      maxlength: 40, 
+      set: normalizeTag 
     },
-    displayName: {    // original casing for showing to users 
-      type: String,
-      trim: true,
-      maxlength: 40
+    displayName: { 
+      type: String, 
+      trim: true, 
+      maxlength: 40 
     }
-  }
+  },
+  { timestamps: true }
 );
 
 export const Tag = mongoose.model("Tag", tagSchema);

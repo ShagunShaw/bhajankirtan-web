@@ -1,33 +1,53 @@
 import mongoose, { Schema } from "mongoose";
 
-const packageSchema = new Schema({
-    packageName: {
-        type: String,
-        required: true,
-        trim: true
-    },
-    startingPrice: {   // Base price
-        type: Number,
-        required: true,
-        min: 1
-    },
-    bulletFeatures: {
-        type: Array,
-        default: []
+const maxItems = (n) => ({
+  validator: (arr) => arr.length <= n,
+  message: `Maximum ${n} items allowed`
+});
+
+const packageSchema = new Schema(
+  {
+    packageName: { 
+        type: String, 
+        required: true, 
+        trim: true 
 
     },
-    workPhotos: [
-        String
-    ],
-    workVideos: [       // This will not be a youTube video link, it will be uploaded directly in cloudinary
-        String
-    ],
-    visibility:{
-        type: String,
-        enum: ["visible", "hidden"],
-        default: "visible",
-        index: true
+    description: { 
+        type: String, 
+        trim: true 
+
+    },
+    price: { 
+        type: Number, 
+        required: true, 
+        min: 1 
+
+    },
+    bulletFeatures: { 
+        type: [String], 
+        default: [] 
+
+    },
+    workPhotos: { 
+        type: [String], 
+        validate: maxItems(8) 
+        
+    },
+    workVideos: { 
+        type: [String], 
+        validate: maxItems(3) 
+        
+    }, // Cloudinary URLs
+    visibility: { 
+        type: String, 
+        enum: ["visible", "hidden"], 
+        default: "visible", 
+        index: true 
+        
     }
-}, { timestamps: true })
+  },
+  { timestamps: true }
+);
 
 export const Package = mongoose.model("Package", packageSchema);

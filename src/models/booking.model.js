@@ -1,60 +1,145 @@
-Also refund, reconfirmation and re-allotment wala part kaise handle krna h look at that too
-Also ask the client ki cutomer ka toh pura detail unko mil jayega, lkin unko contact back kaise karega
-
 import mongoose, { Schema } from "mongoose";
 
-const bookingSchema = new Schema({
-    referenceId: {
-        type: String,
-        required: true,
-        unique: true,
-        index: true
-    },
-    customerName: {
+const allotmentSchema = new Schema(
+  {
+    performer: { 
+        type: Schema.Types.ObjectId, 
+        ref: "Performer", 
+        required: true 
 
     },
-    phone: {
+    role: { 
+        type: String, 
+        trim: true 
+
+
+    }, // optional, e.g. "dholak"
+    status: { 
+        type: String, 
+        enum: ["assigned", "cancelled"], 
+        default: "assigned" 
 
     },
-    // package: {
-    //     type: Schema.Types.ObjectId,
-    //     ref: "Package"
-    // },       OR
-    // package: {
-    //     type: String,
-    //     enum: ["none", ],
-    //     default: "none"
-    // },
-    eventType: {
+    reconfirmed: { 
+        type: Boolean, 
+        default: false 
 
     },
-    eventDate: {
-        index: true
-    },
-    eventTime: {
+    cancelReason: { 
+        type: String, 
+        trim: true 
 
     },
-    customerAddress: {
+    cancelledAt: Date
+  },
+  { timestamps: true }
+);
+
+const bookingSchema = new Schema(
+  {
+    referenceId: { 
+        type: String, 
+        required: true, 
+        unique: true 
 
     },
-    expectedGuests: {
+    customerName: { 
+        type: String, 
+        required: true, 
+        trim: true 
 
     },
-    additionalNote: {
+    phone: { 
+        type: String, 
+        required: true, 
+        trim: true 
 
     },
-    isBookingConfirmed: {
-        index: true,        check this once, shyd yha pe 'index' ni lagana hoga hmlog ko
-        enum: ["Yes", "No", "Rejected"],
-        default: "No"
-    },
-    isBookingReConfirmed: {
-        enum: ["Yes", "No"],
-        default: "No"
-    },
-    amount: {       // making it optional for now, as I need to verify from the client, whether price are fixed or can be negotiable via call
+    email: { 
+        type: String, 
+        trim: true, 
+        lowercase: true 
 
+    },
+
+    bookingType: { 
+        type: String, 
+        enum: ["solo", "package"], 
+        required: true 
+    },
+    requestedPerformer: { 
+        type: Schema.Types.ObjectId, 
+        ref: "Performer" 
+    }, // solo only
+    package: { 
+        type: Schema.Types.ObjectId, 
+        ref: "Package" 
+    },              // package only
+    packageName: { 
+        type: String, 
+        trim: true 
+    },                             // snapshot at request time
+
+    eventType: { 
+        type: String, 
+        required: true, 
+        trim: true 
+    },
+    eventDate: { 
+        type: String, 
+        required: true, 
+        match: /^\d{4}-\d{2}-\d{2}$/ 
+    },
+    eventTime: { 
+        type: String, 
+        required: true 
+    }, // "HH:mm"
+    eventAddress: { 
+        type: String, 
+        required: true, 
+        trim: true 
+    },
+    expectedGuests: { 
+        type: Number, 
+        min: 1 
+    },
+    additionalNote: { 
+        type: String, 
+        trim: true 
+    },
+
+    status: {
+      type: String,
+      enum: ["requested", "confirmed", "rejected", "cancelled", "completed"],
+      default: "requested"
+    },
+    allotments: [allotmentSchema],
+
+    quotedAmount: { 
+        type: Number, 
+        min: 0 
+    }, // price shown at request time
+    finalAmount: { 
+        type: Number, 
+        min: 0 
+    },  // set by admin after the call
+    cancelReason: { 
+        type: String, 
+        trim: true 
     }
-}, { timestamps: true })
+  },
+  { timestamps: true }
+);
+
+bookingSchema.pre("validate", function (next) {
+  if (this.bookingType === "solo" && !this.requestedPerformer)
+    return next(new Error("Solo booking needs a performer"));
+  if (this.bookingType === "package" && !this.package)
+    return next(new Error("Package booking needs a package"));
+  next();
+});
+
+bookingSchema.index({ status: 1, eventDate: 1 });
+bookingSchema.index({ eventDate: 1, "allotments.performer": 1 });
 
 export const Booking = mongoose.model("Booking", bookingSchema);

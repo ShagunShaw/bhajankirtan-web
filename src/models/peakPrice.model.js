@@ -5,14 +5,16 @@ const dateStr = { type: String, required: true, match: /^\d{4}-\d{2}-\d{2}$/ };
 const peakPriceSchema = new Schema(
   {
     performer: { 
-        type: Schema.Types.ObjectId, 
-        ref: "Performer", 
-        required: true 
+      type: Schema.Types.ObjectId, 
+      ref: "Performer", 
+      required: true 
+      
     },
     label: { 
-        type: String, 
-        trim: true, 
-        maxlength: 60 
+      type: String, 
+      trim: true, 
+      maxlength: 60 
+      
     },
     from: dateStr,
     to: {
@@ -22,7 +24,12 @@ const peakPriceSchema = new Schema(
         message: "End date must be on or after the start date"
       }
     },
-    peakPrice: { type: Number, required: true, min: 1 }
+    peakPrice: { 
+      type: Number, 
+      required: true, 
+      min: 1 
+      
+    }
   },
   { timestamps: true }
 );
