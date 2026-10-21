@@ -1,17 +1,18 @@
 import express from 'express';
 import * as packageController from '../controllers/package.controller.js';
+import { verifyJWT } from '../middlewares/verifyJWT.js';
 
 const router = express.Router();
 
-router.get("/", packageController.getAllPackages)
+router.get("/", verifyJWT, packageController.getAllPackages)
 
-router.get("/:packageId", packageController.getPackageById)
+router.get("/:packageId", verifyJWT, packageController.getPackageById)
 
-router.post("/", packageController.createPackage)
+router.post("/", verifyJWT, packageController.createPackage)
 
-router.patch("/:packageId", packageController.updatePackage)
+router.patch("/:packageId", verifyJWT, packageController.updatePackage)
 
-router.delete("/:packageId", packageController.deletePackage)
+router.delete("/:packageId", verifyJWT, packageController.deletePackage)
 
 
 export default router;

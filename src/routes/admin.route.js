@@ -3,6 +3,7 @@ saare routes pe 'verifyJWT' middleware lagana baki h, except login and createAdm
 
 import express from 'express';
 import * as adminController from '../controllers/admin.controller.js';
+import { verifyJWT } from '../middlewares/verifyJWT.js'
 
 const router = express.Router();
 
@@ -12,15 +13,15 @@ router.post("/create-admin", adminController.createAdmin)
 router.post("/login", adminController.login)
 
 Check once i think yh dashboard wala page mei jo 2 subparts h wo ek hi route mei call hoga, also you need to make a logic for getting the COUNT of 'total booking', 'pending request', 'upcoming confirmed' to be displayed in admin dashboard
-router.get("/dashboard/todayEvent", adminController.getAllTodayEvent)
+router.get("/dashboard/todayEvent", verifyJWT, adminController.getAllTodayEvent)
 
-router.get("/dashboard/tommorowEvent", adminController.getAllTommorowEvent)
+router.get("/dashboard/tommorowEvent", verifyJWT, adminController.getAllTommorowEvent)
 
-router.post("/dashboard/markReconfirm/:id", adminController.markReconfirmed)
+router.post("/dashboard/markReconfirm/:id", verifyJWT, adminController.markReconfirmed)
 
 Re-allotment ka bhi ek route banega, now you decide wo route 'booking.route.js' mei hoga ki 'admin.route.js' mei
 
-router.post("/logout", adminController.logout)
+router.post("/logout", verifyJWT, adminController.logout)
 
 
 export default router;
