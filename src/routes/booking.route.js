@@ -14,5 +14,6 @@ router.post("/reject/:bookingId", verifyJWT, bookingController.rejectBooking)
 Decide kro yh wala route kaha hoga, 'admin.route' mei ki 'booking.route' mei
 router.post("/reallot/:bookingId", verifyJWT, bookingController.reAllotBooking)
 
+router.post("/final-amount/:bookingId", verifyJWT, bookingController.editFinalAmount);
 
 export default router;

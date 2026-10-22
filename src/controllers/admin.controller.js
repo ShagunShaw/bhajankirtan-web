@@ -61,7 +61,7 @@ export const adminLogin = async (req, res) => {
     }
 }
 
-export const dashboard = async (req, res) => {     
+export const dashboard = async (req, res) => {
     try {
         const data = await dashBoardService(); // { counts, today, tomorrow }
 
@@ -84,9 +84,15 @@ export const dashboard = async (req, res) => {
 
 export const markReconfirmed = async (req, res) => {
     try {
-        const { bookingId, allotmentId } = req.params;
-        await markReconfirmedService(bookingId, allotmentId);      
-        return res.status(200).json(new apiResponse(200, {bookingId, allotmentId, isMarkedReConfirmed: true}, "The booking has been marked reconfirmed!"))
+        const { bookingId } = req.params;
+
+        const updated = await markReconfirmedService(bookingId);
+
+        return res.status(200).json(new apiResponse(200, {
+            _id: updated._id,
+            referenceId: updated.referenceId,
+            markedReconfirmed: updated.markedReconfirmed
+        }, "The booking has been marked reconfirmed!"))
     } catch (error) {
         if (error instanceof apiError) {
             return res.status(error.status).json(error);
@@ -113,7 +119,7 @@ export const logout = async (req, res) => {
         }
 
         return res.status(200)
-            .clearCookie("accessToken", cookieOptions)    
+            .clearCookie("accessToken", cookieOptions)
             .clearCookie("refreshToken", cookieOptions)
             .json(new apiResponse(200, {}, "User Logged Out Successfully"))
     } catch (error) {

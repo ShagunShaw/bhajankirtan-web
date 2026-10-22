@@ -20,11 +20,6 @@ const allotmentSchema = new Schema(
         default: "assigned" 
 
     },
-    reconfirmed: { 
-        type: Boolean, 
-        default: false 
-
-    },
     cancelReason: { 
         type: String, 
         trim: true 
@@ -117,12 +112,23 @@ const bookingSchema = new Schema(
 
     quotedAmount: { 
         type: Number, 
-        min: 0 
-    }, // price shown at request time
+        required: true, 
+        min: 0, 
+        immutable: true 
+    }, 
     finalAmount: { 
         type: Number, 
         min: 0 
-    },  // set by admin after the call
+    },                                   // starts equal to quotedAmount (e.g. 750 after discount)
+    priceChangeReason: { 
+        type: String, 
+        trim: true, 
+        maxlength: 200 
+    },        
+    markedReconfirmed: { 
+        type: Boolean, 
+        default: false 
+    },
     cancelReason: { 
         type: String, 
         trim: true 
@@ -136,6 +142,7 @@ bookingSchema.pre("validate", function (next) {
     return next(new Error("Solo booking needs a performer"));
   if (this.bookingType === "package" && !this.package)
     return next(new Error("Package booking needs a package"));
+  if (this.isNew && this.finalAmount == null) this.finalAmount = this.quotedAmount;
   next();
 });
 
@@ -143,3 +150,5 @@ bookingSchema.index({ status: 1, eventDate: 1 });
 bookingSchema.index({ eventDate: 1, "allotments.performer": 1 });
 
 export const Booking = mongoose.model("Booking", bookingSchema);
+
+• Also there is some modification in the booking model. Initially you set two amounts: quotedAmount and finalAmount. So I want it to be like this that initially the final amount should be equal to be quoted amount (to be saved like this in the db). if the admin wants to change the price, then he can (optional) set the final amount to be something else, but that also before confirming the booking not afte that.

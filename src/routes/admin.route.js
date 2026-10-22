@@ -14,7 +14,7 @@ router.post("/login", adminController.adminLogin)
 
 router.get("/dashboard", verifyJWT, adminController.dashboard)
 
-router.post("/dashboard/markReconfirm/:bookingId/:allotmentId", verifyJWT, adminController.markReconfirmed)
+router.post("/dashboard/markReconfirm/:bookingId", verifyJWT, adminController.markReconfirmed)
 
 Re-allotment ka bhi ek route banega, now you decide wo route 'booking.route.js' mei hoga ki 'admin.route.js' mei
 

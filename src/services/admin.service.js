@@ -7,32 +7,27 @@ import { istDate } from "../utils/dates.js";
 
 
 const CARD_FIELDS =
-    "referenceId customerName phone eventType eventDate eventTime eventAddress allotments";
+    "referenceId customerName phone eventType eventDate eventTime eventAddress allotments markedReconfirmed";
 
-const toCard = (b) => {
-    const allotments = b.allotments
+const toCard = (b) => ({
+    bookingId: b._id,
+    referenceId: b.referenceId,
+    customerName: b.customerName,
+    phone: b.phone,
+    eventType: b.eventType,
+    eventDate: b.eventDate,
+    eventTime: b.eventTime,
+    eventAddress: b.eventAddress,
+    reconfirmed: b.markedReconfirmed,
+    allotments: b.allotments
         .filter((a) => a.status === "assigned")
         .map((a) => ({
             allotmentId: a._id,
             performerId: a.performer?._id,
             performerName: a.performer?.fullName,
-            role: a.role,
-            reconfirmed: a.reconfirmed
-        }));
-
-    return {
-        bookingId: b._id,
-        referenceId: b.referenceId,
-        customerName: b.customerName,
-        phone: b.phone,
-        eventType: b.eventType,
-        eventDate: b.eventDate,
-        eventTime: b.eventTime,
-        eventAddress: b.eventAddress,
-        allotments,
-        allReconfirmed: allotments.length > 0 && allotments.every((a) => a.reconfirmed)
-    };
-};
+            role: a.role
+        }))
+});
 
 const fetchConfirmedOn = (date) =>
     Booking.find({ status: "confirmed", eventDate: date })
@@ -151,30 +146,28 @@ export const dashBoardService = async () => {
     }
 }
 
-export const markReconfirmedService = async (bookingId, allotmentId) => {
+export const markReconfirmedService = async (bookingId) => {
     try {
-        if (!mongoose.isValidObjectId(bookingId) || !mongoose.isValidObjectId(allotmentId)) {
-            throw new apiError(400, "Invalid ID/s", "Invalid booking or allotment id");
-        }
+        if (!mongoose.isValidObjectId(bookingId)) throw new apiError(400, "Invalid ID", "The provided booking ID is invalid");
 
-        Check once what does this comment means
-        // One atomic update: only matches if the booking is confirmed, the event is
-        // not in the past, and this allotment is still assigned (not cancelled).
         const updated = await Booking.findOneAndUpdate(
             {
                 _id: bookingId,
                 status: "confirmed",
-                eventDate: { $gte: istDate(0) },
-                allotments: { $elemMatch: { _id: allotmentId, status: "assigned" } }
+                markedReconfirmed: false,
+                eventDate: { $gte: istDate(0) }
             },
-            { $set: { "allotments.$[a].reconfirmed": true } },
-            { new: true, arrayFilters: [{ "a._id": allotmentId }] }
+            { $set: { markedReconfirmed: true } },
+            { new: true }
         );
+        if (updated) return updated;
 
-        if (!updated) {
-            throw new apiError(404, "Cannot Reconfirm", "booking not found, not confirmed, already past, or performer was cancelled")
-        }
-        return updated;
+        // Below is the fallback diagnostic check to figure out why the update failed so we can return a specific, meaningful HTTP error to the client.
+        const booking = await Booking.findById(bookingId).select("markedReconfirmed").lean();
+
+        if (booking?.markedReconfirmed) throw new apiError(409, "Already marked as reconfirmed", "This booking ID had been previously been marked reconfirmed by the admin");
+
+        throw new apiError(404, "Cannot reconfirm", "Booking not found, not confirmed, or already past");
     } catch (error) {
         if (error instanceof apiError) throw error;
 
