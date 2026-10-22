@@ -24,3 +24,5 @@ That’s one extra query, and your compound index makes it fast. Put this logic 
 • Ask client ki booking request k time pe hi price fixed rahega ya phir negotiate krke price differ bhi ho skta h, for 'booking.model.js' file
 
 •• Also refund, reconfirmation and re-allotment wala part kaise handle krna h look at that too
+
+• We save the refresh token in the database and verify it against incoming requests to give the server instant revocation control—ensuring that once an admin logs out or a session is compromised, an otherwise valid JWT cannot be used to generate new access tokens.

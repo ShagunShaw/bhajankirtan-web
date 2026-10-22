@@ -83,7 +83,6 @@ export const adminLoginService = async ({ username, email, password }) => {
     }
 }
 
-refresh token ko db mei store hi kyu krre h jb kuch match hi ni krna h, check 'verifyJWT' file;
 export const adminLogoutService = async (adminId) => {
     try {
         const response = await Admin.findByIdAndUpdate(

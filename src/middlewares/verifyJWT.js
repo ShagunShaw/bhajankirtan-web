@@ -62,18 +62,30 @@ const verifyRefreshToken = async (req, res, next) => {
             return res.status(500).json(new apiError(401, "Payload Found", "Payload not found from refresh token"))
         }
 
-        const user= await Admin.findById(decoded._id)
-                               .select("_id username email")
+        const user = await Admin.findById(decoded._id)
+            .select("_id username email refreshToken")
 
         if (!user) return res.status(404).json(new apiError(404, "Not Found", "Admin not found"))
+
+            
+        if (user.refreshToken !== token) {
+            return res.status(401).json(
+                new apiError(401, "Token Revoked", "Refresh token is invalid or session has expired, please login again")
+            )
+        }
 
         const accessToken = generateAccessToken(user._id, user.username, user.email)
         req.user = user
 
-        res.cookie('accessToken', accessToken, {
+        const isProduction = process.env.NODE_ENV === 'production'
+
+        const cookieOptions = {
             httpOnly: true,
-            secure: true
-        })      // will overwrite the previous expired access token
+            secure: isProduction,         // true in prod (HTTPS only), false in dev (allows HTTP)
+            sameSite: isProduction ? 'strict' : 'lax'   // strict in prod (CSRF protection), lax in dev
+        }
+
+        res.cookie('accessToken', accessToken, cookieOptions)       // This will overwrite the previously set access token
 
         return next();
     } catch (err) {
