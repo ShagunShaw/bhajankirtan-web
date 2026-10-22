@@ -1,6 +1,6 @@
 import { apiError } from "../utils/apiError.js";
 import { apiResponse } from "../utils/apiResponse.js";
-import { createAdminService, adminLoginService, adminLogoutService } from "../services/admin.service.js";
+import { createAdminService, adminLoginService, adminLogoutService, dashBoardService, markReconfirmedService } from "../services/admin.service.js";
 
 
 export const createAdmin = async (req, res) => {
@@ -61,9 +61,12 @@ export const adminLogin = async (req, res) => {
     }
 }
 
-export const getAllEvents = async (req, res) => {      // This will contain all today's and tommorow's event along with the booking count
+export const dashboard = async (req, res) => {     
     try {
+        const data = await dashBoardService(); // { counts, today, tomorrow }
 
+        res.status(200)
+            .json(new apiResponse(200, data, "Admin Dashboard fetched successfully!"))
     } catch (error) {
         if (error instanceof apiError) {
             return res.status(error.status).json(error);
@@ -81,7 +84,9 @@ export const getAllEvents = async (req, res) => {      // This will contain all 
 
 export const markReconfirmed = async (req, res) => {
     try {
-
+        const { bookingId, allotmentId } = req.params;
+        await markReconfirmedService(bookingId, allotmentId);      
+        return res.status(200).json(new apiResponse(200, {bookingId, allotmentId, isMarkedReConfirmed: true}, "The booking has been marked reconfirmed!"))
     } catch (error) {
         if (error instanceof apiError) {
             return res.status(error.status).json(error);

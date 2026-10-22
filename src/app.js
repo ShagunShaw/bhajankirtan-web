@@ -11,6 +11,11 @@ app.set('views', path.join(__dirname, 'views'));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, '../public')));
 
+// this should be the last middleware in this file, when you will configure other middlewares here later 
+app.use((err, req, res, next) => {
+  res.status(err.statusCode || 500).send(err.statusCode ? err.message : "Something went wrong");
+});
+
 /* ---------- Public ---------- */
 app.get('/', (req, res) => {
   res.render('public/home', { title: 'BhajanKirtan', categories, performers: performers.filter(p => p.active), packages });

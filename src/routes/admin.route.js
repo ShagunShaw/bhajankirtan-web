@@ -12,10 +12,9 @@ router.post("/create-admin", adminController.createAdmin)
 
 router.post("/login", adminController.adminLogin)
 
-Check once i think yh dashboard wala page mei jo 2 subparts h wo ek hi route mei call hoga, also you need to make a logic for getting the COUNT of 'total booking', 'pending request', 'upcoming confirmed' to be displayed in admin dashboard
-router.get("/dashboard", verifyJWT, adminController.getAllEvents)
+router.get("/dashboard", verifyJWT, adminController.dashboard)
 
-router.post("/dashboard/markReconfirm/:id", verifyJWT, adminController.markReconfirmed)
+router.post("/dashboard/markReconfirm/:bookingId/:allotmentId", verifyJWT, adminController.markReconfirmed)
 
 Re-allotment ka bhi ek route banega, now you decide wo route 'booking.route.js' mei hoga ki 'admin.route.js' mei
 

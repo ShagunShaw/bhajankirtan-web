@@ -1,6 +1,45 @@
+import mongoose from "mongoose";
 import { Admin } from '../models/admin.model.js';
 import { apiError } from '../utils/apiError.js';
 import { generateAccessToken, generateRefreshToken } from '../middlewares/verifyJWT.js';
+import { Booking } from "../models/Booking.js";
+import { istDate } from "../utils/dates.js";
+
+
+const CARD_FIELDS =
+    "referenceId customerName phone eventType eventDate eventTime eventAddress allotments";
+
+const toCard = (b) => {
+    const allotments = b.allotments
+        .filter((a) => a.status === "assigned")
+        .map((a) => ({
+            allotmentId: a._id,
+            performerId: a.performer?._id,
+            performerName: a.performer?.fullName,
+            role: a.role,
+            reconfirmed: a.reconfirmed
+        }));
+
+    return {
+        bookingId: b._id,
+        referenceId: b.referenceId,
+        customerName: b.customerName,
+        phone: b.phone,
+        eventType: b.eventType,
+        eventDate: b.eventDate,
+        eventTime: b.eventTime,
+        eventAddress: b.eventAddress,
+        allotments,
+        allReconfirmed: allotments.length > 0 && allotments.every((a) => a.reconfirmed)
+    };
+};
+
+const fetchConfirmedOn = (date) =>
+    Booking.find({ status: "confirmed", eventDate: date })
+        .select(CARD_FIELDS)
+        .populate("allotments.performer", "fullName")
+        .sort({ eventTime: 1 })
+        .lean();
 
 
 export const createAdminService = async ({ username, password, email, fullName }) => {
@@ -83,17 +122,81 @@ export const adminLoginService = async ({ username, email, password }) => {
     }
 }
 
+export const dashBoardService = async () => {
+    try {
+        const today = istDate(0);
+        const tomorrow = istDate(1);
+
+        const [total, pending, upcomingConfirmed, todayDocs, tomorrowDocs] = await Promise.all([
+            Booking.countDocuments(),
+            Booking.countDocuments({ status: "requested" }),
+            Booking.countDocuments({ status: "confirmed", eventDate: { $gte: today } }),
+            fetchConfirmedOn(today),
+            fetchConfirmedOn(tomorrow)
+        ]);
+
+        return {
+            counts: { total, pending, upcomingConfirmed },
+            today: todayDocs.map(toCard),
+            tomorrow: tomorrowDocs.map(toCard)
+        };
+    } catch (error) {
+        if (error instanceof apiError) throw error;
+
+        throw new apiError(
+            500,
+            error.name || "InternalServerError",
+            error.message || "An unexpected error occurred"
+        );
+    }
+}
+
+export const markReconfirmedService = async (bookingId, allotmentId) => {
+    try {
+        if (!mongoose.isValidObjectId(bookingId) || !mongoose.isValidObjectId(allotmentId)) {
+            throw new apiError(400, "Invalid ID/s", "Invalid booking or allotment id");
+        }
+
+        Check once what does this comment means
+        // One atomic update: only matches if the booking is confirmed, the event is
+        // not in the past, and this allotment is still assigned (not cancelled).
+        const updated = await Booking.findOneAndUpdate(
+            {
+                _id: bookingId,
+                status: "confirmed",
+                eventDate: { $gte: istDate(0) },
+                allotments: { $elemMatch: { _id: allotmentId, status: "assigned" } }
+            },
+            { $set: { "allotments.$[a].reconfirmed": true } },
+            { new: true, arrayFilters: [{ "a._id": allotmentId }] }
+        );
+
+        if (!updated) {
+            throw new apiError(404, "Cannot Reconfirm", "booking not found, not confirmed, already past, or performer was cancelled")
+        }
+        return updated;
+    } catch (error) {
+        if (error instanceof apiError) throw error;
+
+        throw new apiError(
+            500,
+            error.name || "InternalServerError",
+            error.message || "An unexpected error occurred"
+        );
+    }
+}
+
 export const adminLogoutService = async (adminId) => {
     try {
         const response = await Admin.findByIdAndUpdate(
-            adminId,      
+            adminId,
             {
-                $set: {        
+                $set: {
                     refreshToken: null
                 }
             },
             {
-                new: true      
+                new: true
             }
         )
 
