@@ -1,5 +1,6 @@
-import { updateFinalAmount } from "../services/booking.service"
-import { apiResponse } from "../utils/apiResponse";
+import { updateFinalAmount } from "../services/booking.service.js";
+import { apiResponse } from "../utils/apiResponse.js";
+import { apiError } from "../utils/apiError.js";
 
 export const editFinalAmount = async (req, res, next) => {
     try {
