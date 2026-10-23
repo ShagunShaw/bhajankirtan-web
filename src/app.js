@@ -2,6 +2,7 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { iso, categories, performers, packages, peakPrices, bookings } from './data/mockData.js';
+import { apiError } from './utils/apiError.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -13,7 +14,8 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 // this should be the last middleware in this file, when you will configure other middlewares here later 
 app.use((err, req, res, next) => {
-  res.status(err.statusCode || 500).send(err.statusCode ? err.message : "Something went wrong");
+  const status = err.statusCode || 500;
+  res.status(status).json(new apiError(status, "Unknown Error", "Something went wrong"))
 });
 
 /* ---------- Public ---------- */

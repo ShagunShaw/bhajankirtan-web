@@ -4,11 +4,11 @@ import * as performerService from "../services/performer.service.js";
 
 export const getAllPerformers = async (req, res) => {
     try {
-        const performers = await performerService.getAllPerformersService(req.query);
+        const performers = await performerService.getAllPerformersService();
 
-        return res.status(200).json(
-            new apiResponse(200, performers, "Performers fetched successfully")
-        );
+        res.set("Cache-Control", "no-store"); // admin always sees fresh data
+
+        res.status(200).json(new apiResponse(200, performers, "All Performers fetched successfully"));
     } catch (error) {
         if (error instanceof apiError) {
             return res.status(error.status).json(error);

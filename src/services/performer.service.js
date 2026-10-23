@@ -5,24 +5,27 @@ import { Booking } from "../models/booking.model.js";
 import { PeakPrice } from "../models/peakPrice.model.js";
 import { apiError } from "../utils/apiError.js";
 
-export const getAllPerformersService = async (query = {}) => {
+
+const tagNames = (tags = []) => tags.filter(Boolean).map((t) => t.displayName || t.name);
+
+export const getAllPerformersService = async () => {
     try {
-        const filter = {};
-
-        if (query.visibility && ["visible", "hidden"].includes(query.visibility)) {
-            filter.visibility = query.visibility;
-        }
-
-        if (query.search && typeof query.search === "string" && query.search.trim()) {
-            filter.fullName = { $regex: query.search.trim(), $options: "i" };
-        }
-
-        const performers = await Performer.find(filter)
+        const performers = await Performer.find()
+            .select("fullName basePrice profilePhoto experience tags visibility createdAt")
             .populate("tags", "name displayName")
-            .sort({ fullName: 1 })
+            .sort({ createdAt: -1 })
             .lean();
 
-        return performers;
+        return performers.map((p) => ({
+            id: p._id,
+            fullName: p.fullName,
+            basePrice: p.basePrice,
+            profilePhoto: p.profilePhoto,
+            experience: p.experience,
+            visibility: p.visibility,
+            tags: tagNames(p.tags),
+            createdAt: p.createdAt
+        }));
     } catch (error) {
         if (error instanceof apiError) throw error;
 
@@ -105,7 +108,7 @@ export const createPerformerService = async (data) => {
         });
 
         await performer.populate("tags", "name displayName");
-        
+
         return performer.toObject();
     } catch (error) {
         if (error instanceof apiError) throw error;
