@@ -18,6 +18,8 @@ app.use((err, req, res, next) => {
   res.status(status).json(new apiError(status, "Unknown Error", "Something went wrong"))
 });
 
+// configure cloudinary (from utils) and multer (from middleware) if required
+
 /* ---------- Public ---------- */
 app.get('/', (req, res) => {
   res.render('public/home', { title: 'BhajanKirtan', categories, performers: performers.filter(p => p.active), packages });

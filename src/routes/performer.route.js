@@ -15,10 +15,12 @@ router.get("/:performerId", verifyJWT, performerController.getPerformerById)
 
 router.patch("/visibility/:performerId", verifyJWT, performerController.togglePerformerVisibility)
 
+Bina phtot and video k perfomer update kaise krli
 router.patch("/:performerId", verifyJWT, performerController.updatePerformer)
 
 router.delete("/:performerId", verifyJWT, performerController.deletePerformer)
 
+Bina phtos and video upload k performer create kaise hogya
 router.post("/", verifyJWT, performerController.createPerformer);
 
 export default router;

@@ -9,10 +9,8 @@ import * as defaultController from '../controllers/default.controller.js';
 const router = express.Router();
 
 // This route will be served in home page, search page, search page with filters to fetch our performers
+One second, but in our home page only we will be fetching the 'packages' also and this is to be displayed towards the end of the page. So decide, 'packages' home page mei hi show krna h, or you will have a dedicated route/page in frontend. If in home page, then fetch the packages under this route only. If in a separate section/page in frontend, then make another route, controller & services for it
 router.get("/", defaultController.homePage)
-
-This route can have two query params also-> category & q(name of the performer)
-router.get("/performers", defaultController.getAllPerformers)
 
 router.get("/performer/:id", defaultController.getPerformerById)
 

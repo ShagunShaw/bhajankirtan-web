@@ -1,11 +1,12 @@
 import { apiResponse } from "../utils/apiResponse"
+import { getPublicPerformerList } from "../services/default.service"
 
 
 export const homePage = async (req, res) => {
     try {
         const data = await getPublicPerformerList(); // { performers, tags }
 
-        res.set("Cache-Control", "public, max-age=300"); // browser reuses it for 5 minutes
+        res.set("Cache-Control", "public, max-age=600"); // browser reuses it for 10 minutes
 
         res.status(200).json(new apiResponse(200, data, "Performers fetched successfully"));
     } catch (error) {
