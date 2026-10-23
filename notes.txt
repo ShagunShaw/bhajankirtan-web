@@ -26,3 +26,7 @@ That’s one extra query, and your compound index makes it fast. Put this logic 
 •• Also refund, reconfirmation and re-allotment wala part kaise handle krna h look at that too
 
 • We save the refresh token in the database and verify it against incoming requests to give the server instant revocation control—ensuring that once an admin logs out or a session is compromised, an otherwise valid JWT cannot be used to generate new access tokens.
+
+
+• How did we handle the search/get part for getting all performers?
+Ans) One request per page load fetches every visible performer (admin gets everyone, uncached; customers get visible ones with their tags and upcoming peak periods, cached by the browser for 5 minutes), and then the frontend does all the searching and filtering on that list, showing a performer’s peak price when the chosen date falls inside a peak period and the base price otherwise, while the server recalculates the real price at booking.

@@ -8,6 +8,7 @@ import * as defaultController from '../controllers/default.controller.js';
 
 const router = express.Router();
 
+// This route will be served in home page, search page, search page with filters to fetch our performers
 router.get("/", defaultController.homePage)
 
 This route can have two query params also-> category & q(name of the performer)
