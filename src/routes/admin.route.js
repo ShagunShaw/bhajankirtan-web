@@ -3,7 +3,8 @@ saare routes pe 'verifyJWT' middleware lagana baki h, except login and createAdm
 
 import express from 'express';
 import * as adminController from '../controllers/admin.controller.js';
-import { verifyJWT } from '../middlewares/verifyJWT.js'
+import { verifyJWT } from '../middlewares/verifyJWT.js';
+import { getAllTags } from "../controllers/tag.controller.js";
 
 const router = express.Router();
 
@@ -15,6 +16,8 @@ router.post("/login", adminController.adminLogin)
 router.get("/dashboard", verifyJWT, adminController.dashboard)
 
 router.post("/dashboard/markReconfirm/:bookingId", verifyJWT, adminController.markReconfirmed)
+
+router.get("/tags", verifyJWT, getAllTags);
 
 Re-allotment ka bhi ek route banega, now you decide wo route 'booking.route.js' mei hoga ki 'admin.route.js' mei
 

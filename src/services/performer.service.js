@@ -1,12 +1,24 @@
 import mongoose from "mongoose";
 import { Performer } from "../models/performer.model.js";
-import { Tag } from "../models/tags.model.js";
 import { Booking } from "../models/booking.model.js";
 import { PeakPrice } from "../models/peakPrice.model.js";
 import { apiError } from "../utils/apiError.js";
+import { resolveTagIds } from "../services/tag.service.js"
 
 
 const tagNames = (tags = []) => tags.filter(Boolean).map((t) => t.displayName || t.name);
+
+const YOUTUBE = /^https:\/\/(www\.)?(youtube\.com|youtu\.be)\//i;
+
+const cleanVideoLinks = (links) => {
+    if (!Array.isArray(links)) throw new apiError(400, "Validation Error", "Work video links must be an array");
+    const cleaned = links.map((l) => (typeof l === "string" ? l.trim() : "")).filter(Boolean);
+    if (cleaned.some((l) => !YOUTUBE.test(l))) {
+        throw new apiError(400, "Validation Error", "Video links must be YouTube links");
+    }
+    return cleaned;
+};
+
 
 export const getAllPerformersService = async () => {
     try {
@@ -65,50 +77,39 @@ export const getPerformerByIdService = async (performerId) => {
 
 export const createPerformerService = async (data) => {
     try {
-        const {
-            fullName,
-            about,
-            basePrice,
-            tags, Ask claude to fix this: that when a NEW tag is entered, how will we store it in our tag schema and then how will it get stored in our performer schema
-            workPhotos,
-            workVideoLinks,
-            profilePhoto,
-            visibility,
-            experience
-        } = data;
+        const { fullName, about, basePrice, tags, workPhotos, workVideoLinks, profilePhoto, visibility, experience } = data;
 
         if (!fullName || typeof fullName !== "string" || !fullName.trim()) {
             throw new apiError(400, "Validation Error", "Full name is required");
         }
 
         const priceValue = Number(basePrice);
-        if (basePrice == null || !Number.isFinite(priceValue) || priceValue < 1) {
+        if (basePrice == null || String(basePrice).trim() === "" || !Number.isFinite(priceValue) || priceValue < 1) {
             throw new apiError(400, "Validation Error", "Base price must be a valid number greater than or equal to 1");
         }
 
-        // Validate tags if provided
-        if (tags && Array.isArray(tags)) {
-            for (const tagId of tags) {
-                if (!mongoose.isValidObjectId(tagId)) {
-                    throw new apiError(400, "Invalid Tag", `Invalid tag ID provided: ${tagId}`);
-                }
-            }
+        if (workPhotos !== undefined && (!Array.isArray(workPhotos) || workPhotos.length > 10)) {
+            throw new apiError(400, "Validation Error", "Work photos must be an array with max 10 photos");
         }
+
+        const links = workVideoLinks !== undefined ? cleanVideoLinks(workVideoLinks) : [];
+
+        // Tags go last: everything else is validated first, so a bad request never leaves stray tags behind
+        const tagIds = tags !== undefined ? await resolveTagIds(tags) : [];
 
         const performer = await Performer.create({
             fullName: fullName.trim(),
             about: typeof about === "string" ? about.trim() : "",
             basePrice: priceValue,
-            tags: Array.isArray(tags) ? tags : [],
+            tags: tagIds,
             workPhotos: Array.isArray(workPhotos) ? workPhotos : [],
-            workVideoLinks: Array.isArray(workVideoLinks) ? workVideoLinks : [],
+            workVideoLinks: links,
             profilePhoto: typeof profilePhoto === "string" ? profilePhoto.trim() : "",
             visibility: visibility === "hidden" ? "hidden" : "visible",
             experience: typeof experience === "string" ? experience.trim() : ""
         });
 
         await performer.populate("tags", "name displayName");
-
         return performer.toObject();
     } catch (error) {
         if (error instanceof apiError) throw error;
@@ -121,14 +122,13 @@ export const createPerformerService = async (data) => {
     }
 };
 
-Again yha claude se karao ki koi yha tag aaya toh wo tag schema mei fill kaise hoga
 export const updatePerformerService = async (performerId, updateData) => {
     try {
         if (!mongoose.isValidObjectId(performerId)) {
             throw new apiError(400, "Invalid ID", "The provided performer ID is invalid");
         }
 
-        const existing = await Performer.findById(performerId);
+        const existing = await Performer.findById(performerId).select("_id");
         if (!existing) {
             throw new apiError(404, "Performer Not Found", "Performer does not exist");
         }
@@ -148,22 +148,10 @@ export const updatePerformerService = async (performerId, updateData) => {
 
         if (updateData.basePrice !== undefined) {
             const priceValue = Number(updateData.basePrice);
-            if (!Number.isFinite(priceValue) || priceValue < 1) {
+            if (String(updateData.basePrice).trim() === "" || !Number.isFinite(priceValue) || priceValue < 1) {
                 throw new apiError(400, "Validation Error", "Base price must be a valid number greater than or equal to 1");
             }
             allowedUpdates.basePrice = priceValue;
-        }
-
-        if (updateData.tags !== undefined) {
-            if (!Array.isArray(updateData.tags)) {
-                throw new apiError(400, "Validation Error", "Tags must be an array of IDs");
-            }
-            for (const tagId of updateData.tags) {
-                if (!mongoose.isValidObjectId(tagId)) {
-                    throw new apiError(400, "Invalid Tag", `Invalid tag ID: ${tagId}`);
-                }
-            }
-            allowedUpdates.tags = updateData.tags;
         }
 
         if (updateData.workPhotos !== undefined) {
@@ -174,10 +162,7 @@ export const updatePerformerService = async (performerId, updateData) => {
         }
 
         if (updateData.workVideoLinks !== undefined) {
-            if (!Array.isArray(updateData.workVideoLinks)) {
-                throw new apiError(400, "Validation Error", "Work video links must be an array");
-            }
-            allowedUpdates.workVideoLinks = updateData.workVideoLinks;
+            allowedUpdates.workVideoLinks = cleanVideoLinks(updateData.workVideoLinks);
         }
 
         if (updateData.profilePhoto !== undefined) {
@@ -193,6 +178,12 @@ export const updatePerformerService = async (performerId, updateData) => {
 
         if (updateData.experience !== undefined) {
             allowedUpdates.experience = typeof updateData.experience === "string" ? updateData.experience.trim() : "";
+        }
+
+        // Tags last, same reason as create. The list sent REPLACES the performer's tags;
+        // an empty list removes all tags.
+        if (updateData.tags !== undefined) {
+            allowedUpdates.tags = await resolveTagIds(updateData.tags);
         }
 
         const updated = await Performer.findByIdAndUpdate(

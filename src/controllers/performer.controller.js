@@ -141,3 +141,11 @@ export const deletePerformer = async (req, res) => {
         );
     }
 };
+
+
+The flow:
+
+1) When the admin clicks the 'add' or 'edit' performer form, the page fetches the full tag list once (a few KB, even with hundreds of tags).
+2) As the admin types “chowki”, the frontend finds tags that contain it (using the same lowercase and trim rule) and shows “mata ki chowki” as a suggestion.
+3) The admin clicks the suggestion to reuse it, or just keeps typing to create a new tag.
+4) On save, the frontend sends the tag names, and the backend reuses or creates each one with the resolveTagIds code from earlier.

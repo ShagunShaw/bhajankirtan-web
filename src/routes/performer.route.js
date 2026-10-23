@@ -19,7 +19,6 @@ router.patch("/:performerId", verifyJWT, performerController.updatePerformer)
 
 router.delete("/:performerId", verifyJWT, performerController.deletePerformer)
 
-Yha pe bhi issue h for claude to fix, check its service file
 router.post("/", verifyJWT, performerController.createPerformer);
 
 export default router;
