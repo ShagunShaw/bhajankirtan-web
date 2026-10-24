@@ -129,7 +129,6 @@ const bookingSchema = new Schema(
         type: Boolean, 
         default: false 
     },
-    Or rather bookings waale part ka fontend claude se hi banwana, for sure
     cancelledBy: { 
         type: String, 
         enum: ["customer", "admin", "performer"] 

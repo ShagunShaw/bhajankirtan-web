@@ -4,7 +4,7 @@ import { verifyJWT } from '../middlewares/verifyJWT.js';
 
 const router = express.Router();
 
-Handle this route properly in frontend, as you have to also deal with query params here 
+// Handle this route properly in frontend, as you have to also deal with query params here 
 // This route will be served with query params and below are the possble query params for this route
 /**
  * Param	  Default	     Notes

@@ -1,15 +1,3 @@
-• link performer to many tags
-• Database ka configuration create krna baki h, only models create hua h
-• yh sbko 'module.js' format mei likho
-• Admin pe datas manually add kro, be it 1st, 2nd or 3rd admin
-
-• aacha i can do it like this na, make admin model as it is, but instead of hard coding my admin in the mongodb atlas gui, I hard seed it from my postman. in this way, the bcrypt function will hash my password and from then everytime the user will login, it will use the same credentials. Also to ensure consistency i will use the same db url for both hardcoding my admin and for production  ----->>>>   Once you have seeded your initial admin account using Postman, you should either comment out/remove the code for that admin creation route or secure it behind an environment variable check. If left open in production without restrictions, anyone who finds that endpoint could register themselves as an admin. You can use this env also if (process.env.DEV == 'developement')
-
-• Use 'isPasswordCorrect' method (defined in admin model) to check if the admin entered password is correct or not
-• Access and Refresh token for our admin will be created later
-• 'City' will not be there in performer field
-• We will give an option for customers to search by tags/artist_names
-
 • Ques) aacha now tell me, will dispaying any performer price for a particular date, how will be check if there is any peak price for him or should be just display the base price. like then it will be toh 2 db calls na, one to the peak price model, id not found then to the base price model. So what will be our flow    --------->>>>>>>>>   It’s not two calls, because the base price is already stored on the performer record (basePrice). You load the performer anyway to show their profile, so the only extra query is the peak-price check.
 
 Flow for a price on a specific date
@@ -20,13 +8,24 @@ If a record comes back, the price is peakPrice. If not, it’s basePrice.
 
 That’s one extra query, and your compound index makes it fast. Put this logic in one function (the pricingService.js from our folder structure) and use it everywhere, so the price is never calculated in two different ways.
 
-
-• Ask client ki booking request k time pe hi price fixed rahega ya phir negotiate krke price differ bhi ho skta h, for 'booking.model.js' file
-
-•• Also refund, reconfirmation and re-allotment wala part kaise handle krna h look at that too
-
 • We save the refresh token in the database and verify it against incoming requests to give the server instant revocation control—ensuring that once an admin logs out or a session is compromised, an otherwise valid JWT cannot be used to generate new access tokens.
 
 
 • How did we handle the search/get part for getting all performers?
 Ans) One request per page load fetches every visible performer (admin gets everyone, uncached; customers get visible ones with their tags and upcoming peak periods, cached by the browser for 5 minutes), and then the frontend does all the searching and filtering on that list, showing a performer’s peak price when the chosen date falls inside a peak period and the base price otherwise, while the server recalculates the real price at booking.
+
+• admin.route.js file: (Its written there also) Booking model mei yh sara enums h, ["requested", "confirmed", "rejected", "cancelled", "completed"], so baki sb toh ho jayega but for 'completed', the admin most probably will not bear to automatically mark 'completed' for any completed event or should be run a cron-job to automatically mark completed for those events whose scheduled date has been passed iff they are marked as 'confirmed'
+
+• Also routes ka thoda conflict ho skta h between customer and admin accessible routes, so do check them out, and make sure koi do routes common na ho and also koi do routes ka prefix same na ho (Hopefully there are no conflicting routes, but still have a look and cross-check it)
+
+• Dont forget to add the 'Export as Excel' option in the frontedn to enable admin to download all the performers details at once from the website itself
+
+• Bookings waale part ka fontend claude se hi banwana, for sure
+
+
+• The flow (check whether this part is actually working in frontend or not):
+
+1) When the admin clicks the 'add' or 'edit' performer form, the page fetches the full tag list once (a few KB, even with hundreds of tags).
+2) As the admin types “chowki”, the frontend finds tags that contain it (using the same lowercase and trim rule) and shows “mata ki chowki” as a suggestion.
+3) The admin clicks the suggestion to reuse it, or just keeps typing to create a new tag.
+4) On save, the frontend sends the tag names, and the backend reuses or creates each one with the resolveTagIds code from earlier.
