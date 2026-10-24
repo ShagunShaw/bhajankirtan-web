@@ -323,22 +323,64 @@ export const bookPackageService = async (packageId, bookingData) => {
 };
 
 /* ---------- Customer: check booking status via reference ID ---------- */
-export const getBookingStatusService = async (referenceId) => {
+export const getBookingStatusService = async (referenceId, phone) => {
     try {
         if (!referenceId || typeof referenceId !== "string" || !referenceId.trim()) {
             throw new apiError(400, "Invalid Reference ID", "Please provide a valid booking reference ID");
         }
-
-        const booking = await Booking.findOne({ referenceId: referenceId.trim().toUpperCase() })
-            .select("referenceId customerName bookingType requestedPerformer packageName eventType eventDate eventTime eventAddress status quotedAmount finalAmount createdAt")
-            .populate("requestedPerformer", "fullName profilePhoto")
-            .lean();
-
-        if (!booking) {
-            throw new apiError(404, "Booking Not Found", `No booking found with reference ID: ${referenceId}`);
+        const digits = typeof phone === "string" ? phone.replace(/\D/g, "") : "";
+        if (digits.length < 4) {
+            throw new apiError(400, "Validation Error", "Please enter the last 4 digits of the phone number used for the booking");
         }
 
-        return booking;
+        const booking = await Booking.findOne({ referenceId: referenceId.trim().toUpperCase() })
+            .select(
+                "referenceId customerName phone bookingType requestedPerformer packageName eventType eventDate eventTime eventAddress expectedGuests additionalNote status markedReconfirmed quotedAmount finalAmount priceChangeReason cancelledBy cancelledAt cancelReason allotments createdAt"
+            )
+            .populate("requestedPerformer", "fullName profilePhoto")
+            .populate("allotments.performer", "fullName profilePhoto")
+            .lean();
+
+        // Same message for "not found" and "wrong phone", so nobody can probe which IDs exist
+        if (!booking || !booking.phone.replace(/\D/g, "").endsWith(digits.slice(-4))) {
+            throw new apiError(404, "Booking Not Found", "No booking found for this reference ID and phone number");
+        }
+
+        const isClosed = ["rejected", "cancelled"].includes(booking.status);
+
+        return {
+            referenceId: booking.referenceId,
+            status: booking.status,
+            bookingType: booking.bookingType,
+            customerName: booking.customerName,
+            requestedPerformer: booking.requestedPerformer
+                ? { name: booking.requestedPerformer.fullName, profilePhoto: booking.requestedPerformer.profilePhoto }
+                : null,
+            packageName: booking.packageName || null,
+
+            eventType: booking.eventType,
+            eventDate: booking.eventDate,
+            eventTime: booking.eventTime,
+            eventAddress: booking.eventAddress,
+            expectedGuests: booking.expectedGuests ?? null,
+            additionalNote: booking.additionalNote || null,
+
+            quotedAmount: booking.quotedAmount,
+            finalAmount: booking.finalAmount,
+            priceChangeReason: booking.priceChangeReason || null,
+
+            performers: booking.allotments
+                .filter((a) => a.status === "assigned")
+                .map((a) => ({ name: a.performer?.fullName, profilePhoto: a.performer?.profilePhoto, role: a.role })),
+            performersReconfirmed: booking.status === "confirmed" ? booking.markedReconfirmed : null,
+
+            // Only for rejected or cancelled bookings
+            closedReason: isClosed ? booking.cancelReason || null : null,
+            cancelledBy: booking.status === "cancelled" ? booking.cancelledBy || null : null,
+            cancelledAt: booking.status === "cancelled" ? booking.cancelledAt || null : null,
+
+            createdAt: booking.createdAt
+        };
     } catch (error) {
         if (error instanceof apiError) throw error;
 
