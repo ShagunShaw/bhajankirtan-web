@@ -21,6 +21,8 @@ router.get("/tags", verifyJWT, getAllTags);
 
 Re-allotment ka bhi ek route banega, now you decide wo route 'booking.route.js' mei hoga ki 'admin.route.js' mei
 
+Booking model mei yh sara enums h, ["requested", "confirmed", "rejected", "cancelled", "completed"], so baki sb toh ho jayega but for 'completed', will the admin bear to automatically mark 'completed' for any completed event or should be run a cron-job to automatically mark completed for those events whose scheduled date has been passed iff they are marked as 'confirmed'
+
 router.post("/logout", verifyJWT, adminController.logout)
 
 

@@ -18,6 +18,7 @@ router.patch("/visibility/:performerId", verifyJWT, performerController.togglePe
 Bina phtot and video k perfomer update kaise krli
 router.patch("/:performerId", verifyJWT, performerController.updatePerformer)
 
+performer delete krne k baad uska binary data cloudinary se bhi remove kro
 router.delete("/:performerId", verifyJWT, performerController.deletePerformer)
 
 Bina phtos and video upload k performer create kaise hogya

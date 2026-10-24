@@ -3,21 +3,29 @@ There are some routes in this file, whose service we need not to make it separat
 
 Also routes ka thoda conflict ho skta h between customer and admin accessible routes, so do check them out, and make sure koi do routes common na ho and also koi do routes ka prefix same na ho
 
+Also jb app.js mei iss file ka prefix route likhogi, then make it as "/api/v1/default/" else yha kuch routes h, jo other routes a saath  conflicting ho skte h
+
 import express from 'express';
 import * as defaultController from '../controllers/default.controller.js';
 
 const router = express.Router();
 
+NOTE: The frontend makes two backend calls (in parallel) when a customer visits our home page of the website: get("/")  and  get("/packages")
+
 // This route will be served in home page, search page, search page with filters to fetch our performers
-One second, but in our home page only we will be fetching the 'packages' also and this is to be displayed towards the end of the page. So decide, 'packages' home page mei hi show krna h, or you will have a dedicated route/page in frontend. If in home page, then fetch the packages under this route only. If in a separate section/page in frontend, then make another route, controller & services for it
-router.get("/", defaultController.homePage)
+router.get("/", defaultController.getAllPublicPerformers);
+router.get("/packages", defaultController.getAllPublicPackages);
 
 router.get("/performer/:id", defaultController.getPerformerById)
 
-After requesting a booking for a performer, dont forget to send a reference id to the customer in the frontend, using this reference id only they will know the status of thier booking in future
+router.get("/package/:id", defaultController.getPackageById)
+
 router.post("/book/:performerId", defaultController.bookPerformer)
 
-router.get("/booking/:ref", defaultController.getBookingStatus)
+router.post("/book/:packageId", defaultController.bookPerformer)
+
+Will be applicable for both package and performer booking
+router.get("/booking/status", defaultController.getBookingStatus)
 
 
 export default router;
