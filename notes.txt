@@ -29,3 +29,8 @@ Ans) One request per page load fetches every visible performer (admin gets every
 2) As the admin types “chowki”, the frontend finds tags that contain it (using the same lowercase and trim rule) and shows “mata ki chowki” as a suggestion.
 3) The admin clicks the suggestion to reuse it, or just keeps typing to create a new tag.
 4) On save, the frontend sends the tag names, and the backend reuses or creates each one with the resolveTagIds code from earlier.
+
+
+• Performer.route.js mei there are three comments which you need to fix, once you IDE's AI is activated again. For now i am ignoring it
+
+• At the very end, make this website, SEO friendly
