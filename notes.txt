@@ -18,7 +18,7 @@ Ans) One request per page load fetches every visible performer (admin gets every
 
 • Also routes ka thoda conflict ho skta h between customer and admin accessible routes, so do check them out, and make sure koi do routes common na ho and also koi do routes ka prefix same na ho (Hopefully there are no conflicting routes, but still have a look and cross-check it)
 
-• Dont forget to add the 'Export as Excel' option in the frontedn to enable admin to download all the performers details at once from the website itself
+• Dont forget to add the 'Export as Excel' option in the frontend to enable admin to download all the performers details at once from the website itself
 
 • Bookings waale part ka fontend claude se hi banwana, for sure
 
@@ -31,6 +31,8 @@ Ans) One request per page load fetches every visible performer (admin gets every
 4) On save, the frontend sends the tag names, and the backend reuses or creates each one with the resolveTagIds code from earlier.
 
 
-• Performer.route.js mei there are three comments which you need to fix, once you IDE's AI is activated again. For now i am ignoring it
-
 • At the very end, make this website, SEO friendly
+
+• Ek baar client se confirm kro, unka images/videos ka service provider kaun hoga
+
+• Performer.route.js mei there are three comments which you need to fix, once you IDE's AI is activated again. For now i am ignoring it

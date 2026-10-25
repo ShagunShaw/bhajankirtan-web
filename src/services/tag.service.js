@@ -1,4 +1,4 @@
-import { Tag, normalizeTag } from "../models/Tag.js";
+import { Tag, normalizeTag } from "../models/tags.model.js";
 import { apiError } from "../utils/apiError.js";
 
 const MAX_TAGS = 10;

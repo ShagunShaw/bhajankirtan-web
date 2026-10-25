@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 import { Admin } from '../models/admin.model.js';
 import { apiError } from '../utils/apiError.js';
 import { generateAccessToken, generateRefreshToken } from '../middlewares/verifyJWT.js';
-import { Booking } from "../models/Booking.js";
+import { Booking } from "../models/Booking.model.js";
 import { istDate } from "../utils/dates.js";
 
 

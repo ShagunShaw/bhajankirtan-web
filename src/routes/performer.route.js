@@ -1,6 +1,6 @@
 import express from 'express';
-import * as performerController from '../controllers/performer.controller';
-import { verifyJWT } from '../middlewares/verifyJWT';
+import * as performerController from '../controllers/performer.controller.js';
+import { verifyJWT } from '../middlewares/verifyJWT.js';
 
 const router = express.Router();
 

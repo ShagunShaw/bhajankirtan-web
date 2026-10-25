@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken'
-import { apiError } from "../utils/apiError"
-import { Admin } from '../models/admin.model'
+import { apiError } from '../utils/apiError.js'
+import { Admin } from '../models/admin.model.js'
 
 const ACCESS_TOKEN_SECRET = process.env.ACCESS_TOKEN_SECRET
 const ACCESS_TOKEN_EXPIRY = process.env.ACCESS_TOKEN_EXPIRY

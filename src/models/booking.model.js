@@ -154,4 +154,5 @@ bookingSchema.pre("validate", function (next) {
 bookingSchema.index({ status: 1, eventDate: 1 });
 bookingSchema.index({ eventDate: 1, "allotments.performer": 1 });
 
-export const Booking = mongoose.model("Booking", bookingSchema);
+// export const Booking = mongoose.model("Booking", bookingSchema);
+export const Booking = mongoose.models.Booking || mongoose.model("Booking", bookingSchema);

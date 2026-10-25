@@ -13,7 +13,7 @@ const start = async () => {
     }
 
     try {
-        await mongoose.connect(process.env.MONGODB_URI);
+        await mongoose.connect(MONGODB_URI);
         console.log("MongoDB connected");
     } catch (err) {
         console.error("MongoDB connection failed:", err.message);
@@ -22,7 +22,7 @@ const start = async () => {
 
     // 0.0.0.0 so the app is reachable from outside the Docker container
     // const server = app.listen(PORT, "0.0.0.0", () => console.log(`Server running on port ${PORT}`));
-    const server = app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    const server = app.listen(PORT, () => console.log(`Server running on port ${PORT}, and url is "http://localhost:3000"`));
 
     // Docker stops containers with SIGTERM: finish current requests, then close the DB
     const shutdown = (signal) => {
