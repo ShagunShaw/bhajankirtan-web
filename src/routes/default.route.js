@@ -8,12 +8,12 @@ const router = express.Router();
 // NOTE: The frontend makes two backend calls (in parallel) when a customer visits our home page of the website: get("/")  and  get("/packages")
 
 // This route will be served in home page, search page, search page with filters to fetch our performers
-router.get("/", defaultController.getAllPublicPerformers);
-router.get("/packages", defaultController.getAllPublicPackages);
+router.get("/", defaultController.getAllPublicPerformers);      // Checked
+router.get("/packages", defaultController.getAllPublicPackages);        // Checked
 
-router.get("/performer/:id", defaultController.getPerformerById)
+router.get("/performer/:id", defaultController.getPerformerById)        // Checked
 
-router.get("/package/:id", defaultController.getPackageById)
+router.get("/package/:id", defaultController.getPackageById)        // Checked
 
 router.post("/book/:performerId", defaultController.bookPerformer)
 

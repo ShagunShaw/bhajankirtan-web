@@ -76,9 +76,9 @@ export const updateBasePriceService = async (performerId, basePrice) => {
     }
 };
 
-export const createPeakPriceService = async ({ performer, label, from, to, peakPrice }) => {
+export const createPeakPriceService = async ({ performerId, label, from, to, peakPrice }) => {
     try {
-        if (!performer || !mongoose.isValidObjectId(performer)) {
+        if (!performerId || !mongoose.isValidObjectId(performerId)) {
             throw new apiError(400, "Invalid Performer", "A valid performer ID is required");
         }
 
@@ -100,14 +100,14 @@ export const createPeakPriceService = async ({ performer, label, from, to, peakP
         }
 
         // Verify performer exists
-        const performerDoc = await Performer.findById(performer).select("fullName");
+        const performerDoc = await Performer.findById(performerId).select("fullName");
         if (!performerDoc) {
             throw new apiError(404, "Performer Not Found", "The specified performer does not exist");
         }
 
         // Check for date range overlap for the same performer
         const overlap = await PeakPrice.findOne({
-            performer,
+            performerId,
             from: { $lte: to },
             to: { $gte: from }
         });
@@ -121,7 +121,7 @@ export const createPeakPriceService = async ({ performer, label, from, to, peakP
         }
 
         const created = await PeakPrice.create({
-            performer,
+            performer: performerId,
             label: typeof label === "string" ? label.trim().slice(0, 60) : "",
             from,
             to,

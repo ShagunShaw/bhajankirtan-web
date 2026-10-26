@@ -17,6 +17,7 @@ router.patch("/visibility/:performerId", verifyJWT, performerController.togglePe
 router.patch("/:performerId", verifyJWT, upload.any(), performerController.updatePerformer)       // Recheck after changes had been made to this route
 
 // performer delete krne k baad uska corresponding photots and videos cloudinary se bhi remove kro (just as we did in our package route)
+// Also performer delete krne k baad, uska jo corresponding tags th usko bhi count-- kro in the tags table, and if count of any tag has reached 0, then remove that tag properly
 router.delete("/:performerId", verifyJWT, performerController.deletePerformer)      // Recheck after changes had been made to this route
 
 // In this route, all the photos and videos, if there is any update in it, will be uploaded by the admin in req.files, and then will be uploaded on cloudinary from there (just as we did in our package route). 

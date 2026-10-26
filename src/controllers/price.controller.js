@@ -51,10 +51,10 @@ export const updateBasePrice = async (req, res) => {
 
 export const createPeakPrice = async (req, res) => {
     try {
-        const { performer, label, from, to, peakPrice } = req.body;
+        const { performerId, label, from, to, peakPrice } = req.body;
 
         const created = await priceService.createPeakPriceService({
-            performer,
+            performerId,
             label,
             from,
             to,
