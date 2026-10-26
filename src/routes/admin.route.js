@@ -9,11 +9,11 @@ import { upload } from "../middlewares/multer.middleware.js"
 const router = express.Router();
 
 // This route is to be accessed only by me to just create the admin in the db, after that dont forget to comment out this route only (not its controllers and services) to prevent it from any misuse
-router.post("/create-admin", upload.none(), adminController.createAdmin)
+router.post("/create-admin", upload.none(), adminController.createAdmin)    // Checked
 
-router.post("/login", upload.none(), adminController.adminLogin)
+router.post("/login", upload.none(), adminController.adminLogin)    // Checked
 
-router.get("/dashboard", verifyJWT, adminController.dashboard)
+router.get("/dashboard", verifyJWT, adminController.dashboard)      // Checked
 
 router.post("/dashboard/markReconfirm/:bookingId", verifyJWT, adminController.markReconfirmed)
 
@@ -21,7 +21,7 @@ router.get("/tags", verifyJWT, getAllTags);
 
 // Booking model mei yh sara enums h, ["requested", "confirmed", "rejected", "cancelled", "completed"], so baki sb toh ho jayega but for 'completed', the admin most probably will not bear to automatically mark 'completed' for any completed event or should be run a cron-job to automatically mark completed for those events whose scheduled date has been passed iff they are marked as 'confirmed'
 
-router.post("/logout", verifyJWT, adminController.logout)
+router.post("/logout", verifyJWT, adminController.logout)       // Checked
 
 
 export default router;

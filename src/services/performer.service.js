@@ -228,7 +228,7 @@ export const togglePerformerVisibilityService = async (performerId) => {
                     }
                 }
             ],
-            { new: true }
+            { new: true, updatePipeline: true }
         ).select("_id fullName visibility");
 
         if (!updated) {
