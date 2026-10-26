@@ -2,6 +2,7 @@
 
 import express from 'express';
 import * as defaultController from '../controllers/default.controller.js';
+import { upload } from "../middlewares/multer.middleware.js"
 
 const router = express.Router();
 
@@ -15,12 +16,12 @@ router.get("/performer/:id", defaultController.getPerformerById)        // Check
 
 router.get("/package/:id", defaultController.getPackageById)        // Checked
 
-router.post("/book/:performerId", defaultController.bookPerformer)
+router.post("/book/performer/:performerId", upload.none(), defaultController.bookPerformer)     // Checked
 
-router.post("/book/:packageId", defaultController.bookPerformer)
+router.post("/book/package/:packageId", upload.none(), defaultController.bookPackage)       // Checked
 
 // Will be applicable for both package and performer booking
-router.get("/booking/status", defaultController.getBookingStatus)
+router.get("/booking/status", upload.none(), defaultController.getBookingStatus)        // Checked
 
 
 export default router;

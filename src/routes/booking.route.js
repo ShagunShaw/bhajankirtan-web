@@ -1,6 +1,7 @@
 import express from 'express';
 import * as bookingController from '../controllers/booking.controller.js';
 import { verifyJWT } from '../middlewares/verifyJWT.js';
+import { upload } from '../middlewares/multer.middleware.js';
 
 const router = express.Router();
 
@@ -12,15 +13,15 @@ const router = express.Router();
    page	1	  page         number
    limit	  50	         maximum 100
  */
-router.get("/", verifyJWT, bookingController.getAllBookings)
+router.get("/", verifyJWT, bookingController.getAllBookings)    // Checked
 
 router.post("/confirm/:bookingId", verifyJWT, bookingController.confirmBooking)
 
-router.post("/reject/:bookingId", verifyJWT, bookingController.rejectBooking)
+router.post("/reject/:bookingId", verifyJWT, bookingController.rejectBooking)       // Checked
 
 router.post("/reallot/:bookingId", verifyJWT, bookingController.reAllotBooking)
 
-router.post("/final-amount/:bookingId", verifyJWT, bookingController.editFinalAmount);
+router.post("/final-amount/:bookingId", verifyJWT, upload.none(), bookingController.editFinalAmount);     // Checked
 
 router.post("/cancel/:bookingId", bookingController.cancelBooking);
 

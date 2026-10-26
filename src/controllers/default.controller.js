@@ -146,9 +146,9 @@ export const bookPackage = async (req, res) => {
 
 export const getBookingStatus = async (req, res) => {
     try {
-        const { refId } = req.body;
+        const { refId, phone } = req.body;
 
-        const booking = await defaultService.getBookingStatusService(refId);
+        const booking = await defaultService.getBookingStatusService(refId, phone);
 
         return res.status(200).json(
             new apiResponse(200, booking, "Booking status retrieved successfully")

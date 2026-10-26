@@ -17,7 +17,7 @@ router.get("/dashboard", verifyJWT, adminController.dashboard)      // Checked
 
 router.post("/dashboard/markReconfirm/:bookingId", verifyJWT, adminController.markReconfirmed)
 
-router.get("/tags", verifyJWT, getAllTags);
+router.get("/tags", verifyJWT, getAllTags);         // Checked
 
 // Booking model mei yh sara enums h, ["requested", "confirmed", "rejected", "cancelled", "completed"], so baki sb toh ho jayega but for 'completed', the admin most probably will not bear to automatically mark 'completed' for any completed event or should be run a cron-job to automatically mark completed for those events whose scheduled date has been passed iff they are marked as 'confirmed'
 
