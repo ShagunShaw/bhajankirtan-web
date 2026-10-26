@@ -299,7 +299,7 @@ export const togglePackageVisibilityService = async (packageId) => {
                     }
                 }
             ],
-            { new: true }
+            { new: true, updatePipeline: true }
         ).select("_id packageName visibility");
 
         if (!updated) {

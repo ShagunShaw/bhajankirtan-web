@@ -14,12 +14,13 @@ router.get("/:performerId", verifyJWT, performerController.getPerformerById)    
 router.patch("/visibility/:performerId", verifyJWT, performerController.togglePerformerVisibility)     // Checked
 
 // In this route, all the photos and videos will be uploaded by the admin in req.files, and then will be uploaded on cloudinary from there (just as we did in our package route)
-router.patch("/:performerId", verifyJWT, performerController.updatePerformer)       // Recheck after changes had been made to this route
+router.patch("/:performerId", verifyJWT, upload.any(), performerController.updatePerformer)       // Recheck after changes had been made to this route
 
 // performer delete krne k baad uska corresponding photots and videos cloudinary se bhi remove kro (just as we did in our package route)
 router.delete("/:performerId", verifyJWT, performerController.deletePerformer)      // Recheck after changes had been made to this route
 
-// In this route, all the photos and videos, if there is any update in it, will be uploaded by the admin in req.files, and then will be uploaded on cloudinary from there (just as we did in our package route)
+// In this route, all the photos and videos, if there is any update in it, will be uploaded by the admin in req.files, and then will be uploaded on cloudinary from there (just as we did in our package route). 
+// just like it created 'uploadPackageMedia' for package route, can it create something like this for the create and update performer route also, so that we can use something like 'uploadPackageMedia' instead of 'upload.any()' 
 router.post("/", verifyJWT, upload.any(), performerController.createPerformer);     // Recheck after changes had been made to this route
 
 export default router;
