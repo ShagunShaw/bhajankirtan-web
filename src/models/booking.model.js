@@ -142,13 +142,12 @@ const bookingSchema = new Schema(
   { timestamps: true }
 );
 
-bookingSchema.pre("validate", function (next) {
+bookingSchema.pre("validate", function () {
   if (this.bookingType === "solo" && !this.requestedPerformer)
     return next(new Error("Solo booking needs a performer"));
   if (this.bookingType === "package" && !this.package)
     return next(new Error("Package booking needs a package"));
   if (this.isNew && this.finalAmount == null) this.finalAmount = this.quotedAmount;
-  next();
 });
 
 bookingSchema.index({ status: 1, eventDate: 1 });

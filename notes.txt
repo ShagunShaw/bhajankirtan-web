@@ -33,6 +33,11 @@ Ans) One request per page load fetches every visible performer (admin gets every
 
 • At the very end, make this website, SEO friendly
 
+• The admin-creation route is to be accessed only by me to just create the admin in the db, after that dont forget to comment out this route only (not its controllers and services) to prevent it from any misuse
+
 • Ek baar client se confirm kro, unka images/videos ka service provider kaun hoga
 
 • Performer.route.js mei there are three comments which you need to fix, once you IDE's AI is activated again. For now i am ignoring it
+
+
+• Use `upload.fields([{ name: "avatar", maxCount: 1 }, { name: "docs", maxCount: 5 }])` for multiple file fields (or `upload.array("images", 5)` for one field with many files); text fields land in `req.body` and files in `req.files`. And if nothing is there, then use upload.none()

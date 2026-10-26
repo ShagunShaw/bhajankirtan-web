@@ -4,13 +4,14 @@ import express from 'express';
 import * as adminController from '../controllers/admin.controller.js';
 import { verifyJWT } from '../middlewares/verifyJWT.js';
 import { getAllTags } from "../controllers/tag.controller.js";
+import { upload } from "../middlewares/multer.middleware.js"
 
 const router = express.Router();
 
 // This route is to be accessed only by me to just create the admin in the db, after that dont forget to comment out this route only (not its controllers and services) to prevent it from any misuse
-router.post("/create-admin", adminController.createAdmin)
+router.post("/create-admin", upload.none(), adminController.createAdmin)
 
-router.post("/login", adminController.adminLogin)
+router.post("/login", upload.none(), adminController.adminLogin)
 
 router.get("/dashboard", verifyJWT, adminController.dashboard)
 

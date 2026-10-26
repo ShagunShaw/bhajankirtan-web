@@ -112,6 +112,8 @@ export const logout = async (req, res) => {
     try {
         const response = await adminLogoutService(req.user._id);
 
+        const isProduction = process.env.NODE_ENV === "production";
+
         const cookieOptions = {
             httpOnly: true,
             secure: isProduction,         // true in prod (HTTPS only), false in dev (allows HTTP)
