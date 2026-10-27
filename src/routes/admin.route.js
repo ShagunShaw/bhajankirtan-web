@@ -15,7 +15,7 @@ router.post("/login", upload.none(), adminController.adminLogin)    // Checked
 
 router.get("/dashboard", verifyJWT, adminController.dashboard)      // Checked
 
-router.post("/dashboard/markReconfirm/:bookingId", verifyJWT, adminController.markReconfirmed)
+router.post("/dashboard/markReconfirm/:bookingId", verifyJWT, adminController.markReconfirmed)      // Checked
 
 router.get("/tags", verifyJWT, getAllTags);         // Checked
 
