@@ -1,82 +1,144 @@
-<%- include('../partials/header', { title }) %>
+<%- include("../partials/header", { title: "BhajanKirtan | Book Devotional Artists" }) %>
+<%
+  const grads = [
+    "linear-gradient(160deg,#f59e0b,#b45309)", "linear-gradient(160deg,#9b1c32,#52091a)",
+    "linear-gradient(160deg,#e07b00,#7a1022)", "linear-gradient(160deg,#c2410c,#7c2d12)"
+  ];
+  const inr = (n) => "₹" + Number(n || 0).toLocaleString("en-IN");
+  const initial = (name = "") => name.replace(/^(Pt\.|Acharya|Shri|Shree)\s+/i, "").trim().charAt(0).toUpperCase();
+%>
 
-<section class="hero">
-  <div class="container">
-    <h1>Book the Right Performer for Your Devotional Event</h1>
-    <p>Jagrata, Mata Ki Chowki, Rudra Abhishek and more. Find, compare and book in minutes.</p>
-    <form class="search-box" action="/performers" method="GET">
-      <select name="event">
-        <option value="">Event type</option>
-        <% categories.forEach(c => { %>
-          <option value="<%= c.name %>"><%= c.name %></option>
-        <% }) %>
-      </select>
-      <input type="text" name="city" placeholder="City">
-      <input type="date" name="date">
-      <button type="submit" class="btn">Search</button>
-    </form>
+<!-- HERO -->
+<div class="hero">
+  <div class="wrap hero-grid">
+    <div>
+      <span class="kicker">॥ Shubh Aarambh ॥</span>
+      <h1>Invite Divine Music <span>Into Your Home</span></h1>
+      <p class="sub">Book verified bhajan singers, kirtan mandalis and pandits for Jagrata, Mata ki Chowki, Rudra Abhishek and every sacred occasion.</p>
+      <form class="search" action="/performers" method="GET">
+        <input type="text" name="q" placeholder="Search artist or event type">
+        <button type="submit">Search</button>
+      </form>
+      <div class="pop">
+        Popular:
+        <a href="/performers?tag=jagrata">Jagrata</a>
+        <a href="/performers?tag=mata-ki-chowki">Mata ki Chowki</a>
+        <a href="/performers?tag=satsang">Satsang</a>
+      </div>
+    </div>
+    <div class="window"><span>ॐ</span></div>
   </div>
-</section>
+</div>
+<div class="garland"></div>
 
-<section class="section">
-  <div class="container">
-    <h2 class="section-title">Browse by Event</h2>
-    <div class="category-grid">
-      <% categories.forEach(c => { %>
-        <a href="/performers?event=<%= encodeURIComponent(c.name) %>" class="category-card">
-          <span class="category-icon"><%= c.icon %></span>
-          <span><%= c.name %></span>
+<!-- EVENT TYPES -->
+<div class="events">
+  <div class="wrap ev-row">
+    <a href="/performers?tag=jagrata" class="ev"><div class="ring">🪔</div><b>Jagrata</b></a>
+    <a href="/performers?tag=mata-ki-chowki" class="ev"><div class="ring">🔱</div><b>Mata ki Chowki</b></a>
+    <a href="/performers?tag=rudra-abhishek" class="ev"><div class="ring">🕉️</div><b>Rudra Abhishek</b></a>
+    <a href="/performers?tag=satsang" class="ev"><div class="ring">📿</div><b>Satsang</b></a>
+    <a href="/performers?tag=sundarkand" class="ev"><div class="ring">🚩</div><b>Sundarkand</b></a>
+  </div>
+</div>
+
+<!-- PERFORMERS -->
+<section id="performers">
+  <div class="wrap">
+    <div class="head">
+      <h2>Our Featured Artists</h2>
+      <div class="orn">❖</div>
+      <p>Handpicked performers trusted by hundreds of families</p>
+    </div>
+    <div class="g-perf">
+      <% if (!performers || !performers.length) { %>
+        <p class="empty">Artists will appear here soon.</p>
+      <% } %>
+      <% (performers || []).forEach((p, i) => { %>
+        <a href="/performers/<%= p._id %>" class="perf">
+          <div class="arch" style="background:<%= grads[i % grads.length] %>">
+            <% if (p.profilePhoto) { %>
+              <img src="<%= p.profilePhoto %>" alt="<%= p.fullName %>" loading="lazy">
+            <% } else { %>
+              <%= initial(p.fullName) %>
+            <% } %>
+          </div>
+          <h3><%= p.fullName %></h3>
+          <% if (p.experience) { %><div class="exp"><%= p.experience %> experience</div><% } %>
+          <div class="tags">
+            <% (p.tags || []).slice(0, 3).forEach((t) => { %>
+              <span class="tag"><%= t.displayName || t.name %></span>
+            <% }) %>
+          </div>
+          <div class="price">From <b><%= inr(p.basePrice) %></b></div>
+          <span class="go">View &amp; Book</span>
         </a>
       <% }) %>
     </div>
+    <div class="center"><a href="/performers" class="btn btn-red">Load More Performers</a></div>
   </div>
 </section>
 
-<section class="section section-alt">
-  <div class="container">
-    <h2 class="section-title">Featured Performers</h2>
-    <div class="card-grid">
-      <% performers.forEach(p => { %>
-        <div class="performer-card">
-          <div class="avatar"><%= p.name.charAt(0) %></div>
-          <h3><%= p.name %></h3>
-          <p class="muted"><%= p.speciality %></p>
-          <p class="meta">📍 <%= p.city %> &nbsp;|&nbsp; <%= p.experience %> yrs experience</p>
-          <p class="price">From ₹<%= p.price.toLocaleString('en-IN') %></p>
-          <a href="/performers/<%= p.id %>" class="btn btn-outline">View Profile</a>
-        </div>
-      <% }) %>
+<!-- PACKAGES -->
+<div class="garland"></div>
+<section id="packages" class="packs">
+  <div class="wrap">
+    <div class="head">
+      <h2>Popular Packages</h2>
+      <div class="orn" style="color:var(--gold-soft)">❖</div>
+      <p>Artists, sound and setup in one simple booking</p>
     </div>
-  </div>
-</section>
-
-<section class="section" id="how">
-  <div class="container">
-    <h2 class="section-title">How It Works</h2>
-    <div class="steps">
-      <div class="step"><span>1</span><h4>Search</h4><p>Choose event type, city and date.</p></div>
-      <div class="step"><span>2</span><h4>Request</h4><p>Pick a performer and send a booking request.</p></div>
-      <div class="step"><span>3</span><h4>Confirmation</h4><p>We confirm availability and update you by email and WhatsApp.</p></div>
-    </div>
-  </div>
-</section>
-
-<section class="section section-alt" id="packages">
-  <div class="container">
-    <h2 class="section-title">Our Packages</h2>
-    <div class="card-grid">
-      <% packages.forEach(pk => { %>
-        <div class="package-card <%= pk.featured ? 'featured' : '' %>">
-          <h3><%= pk.name %></h3>
-          <p class="price"><%= pk.price %></p>
+    <div class="g-pack">
+      <% if (!packages || !packages.length) { %>
+        <p class="empty">Packages will appear here soon.</p>
+      <% } %>
+      <% (packages || []).forEach((pkg, i) => { %>
+        <div class="pack <%= i === 1 ? 'best' : '' %>">
+          <% if (i === 1) { %><span class="stamp">MOST BOOKED</span><% } %>
+          <h3><%= pkg.packageName %></h3>
+          <div class="amt"><%= inr(pkg.price) %> <small>onwards</small></div>
           <ul>
-            <% pk.features.forEach(f => { %><li>✓ <%= f %></li><% }) %>
+            <% (pkg.inclusions || []).forEach((item) => { %>
+              <li><%= item %></li>
+            <% }) %>
           </ul>
-          <a href="/performers" class="btn">Choose <%= pk.name %></a>
+          <a href="/packages/<%= pkg._id %>" class="btn <%= i === 1 ? 'btn-gold' : 'btn-red' %>">Book This Package</a>
         </div>
       <% }) %>
+    </div>
+    <div class="center"><a href="/packages" class="btn btn-line">Load More Packages</a></div>
+  </div>
+</section>
+<div class="garland"></div>
+
+<!-- WHATSAPP -->
+<section id="contact">
+  <div class="wrap">
+    <div class="wa">
+      <span class="emoji">🙏</span>
+      <h2>Need help choosing the right artist?</h2>
+      <p>Share your event date on WhatsApp and our team will suggest the best options within minutes.</p>
+      <a class="btn btn-wa" href="https://wa.me/919999999999?text=Hello%20BhajanKirtan%2C%20I%20want%20to%20book%20an%20artist" target="_blank" rel="noopener">Chat on WhatsApp</a>
     </div>
   </div>
 </section>
 
-<%- include('../partials/footer') %>
+<!-- ABOUT -->
+<section id="about" style="padding-top:0">
+  <div class="wrap about-grid about">
+    <div class="about-arch">🪔</div>
+    <div>
+      <h2>About BhajanKirtan</h2>
+      <div class="orn" style="justify-content:flex-start"><span style="width:70px;height:2px;background:var(--gold)"></span></div>
+      <p>BhajanKirtan connects families with experienced devotional artists for every sacred occasion. From intimate satsangs to grand all-night jagratas, we take care of the artists, the schedule and the details, so you can be fully present in the celebration.</p>
+      <p>Every performer is personally verified, and every booking is confirmed by our team before your event.</p>
+      <div class="stats">
+        <div class="stat"><b>500+</b><span>Events done</span></div>
+        <div class="stat"><b>40+</b><span>Artists</span></div>
+        <div class="stat"><b>4.9★</b><span>Avg. rating</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%- include("../partials/footer") %>

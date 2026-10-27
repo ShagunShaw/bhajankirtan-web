@@ -3,8 +3,46 @@ import { Router } from "express";
 const router = Router();
 const page = (view, title, extra = {}) => (req, res) => res.render(view, { title, ...extra });
 
+const WEB_ROUTE = process.env.NODE_ENV === 'production' ? process.env.WEB_ROUTE : `http://localhost:${process.env.PORT}/api/`
+
 /* Customer pages */
-router.get("/", page("public/home", "BhajanKirtan"));
+router.get("/", async (req, res, next) => {
+  try {
+    const base = WEB_ROUTE.replace(/\/+$/, "");
+
+    // Fetch both APIs in parallel
+    const [performerRes, packageRes] = await Promise.all([
+      fetch(`${base}/default/`),
+      fetch(`${base}/default/packages`)
+    ]);
+
+    if (!performerRes.ok || !packageRes.ok) {
+      throw new Error("Failed to fetch homepage data");
+    }
+
+    const [performerResult, packageResult] = await Promise.all([
+      performerRes.json(),
+      packageRes.json()
+    ]);
+
+    if (!performerResult.success || !packageResult.success) {
+      throw new Error("API returned an unsuccessful response");
+    }
+
+    const performers = performerResult.data.performers || [];
+    const tags = performerResult.data.tags || [];
+    const packages = packageResult.data || [];
+
+    res.render("public/home", {
+      title: "BhajanKirtan | Book Devotional Artists",
+      performers,
+      tags,
+      packages
+    });
+  } catch (err) {
+    next(err);
+  }
+});
 router.get("/search", page("public/performers", "Find Performers"));
 router.get("/performers/:id", page("public/performer-detail", "Performer"));
 router.get("/packages/:id", page("public/package-detail", "Package"));
