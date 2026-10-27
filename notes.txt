@@ -41,5 +41,8 @@ Ans) One request per page load fetches every visible performer (admin gets every
 
 • Since the data in the booking table can grow over time, and once the event is completed, you dont need that data anymore, so its better to delete it timely from the db, so that our client do not have to pay in future for those unnecessary datas. So once ask the client about it, at what interval, they want their data to get cleaned: daily, weekly or monthly
 
+• Frontend pe we are only handling the case for if everything goes right, but if anything goes not then we need to dispaly a proper mssg with a proper UI for it, so do that also, once all the pages has been done
+
+• check on frontend price lsiting part, ki kisi performer k peakPice k time pe hamara website uss performer ka basePrice na show krra ho, and from backend we are sending the response correctly do dw about it
 
 • Use `upload.fields([{ name: "avatar", maxCount: 1 }, { name: "docs", maxCount: 5 }])` for multiple file fields (or `upload.array("images", 5)` for one field with many files); text fields land in `req.body` and files in `req.files`. And if nothing is there, then use upload.none()

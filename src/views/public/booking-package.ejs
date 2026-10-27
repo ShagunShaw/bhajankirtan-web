@@ -1,0 +1,285 @@
+
+<%- include("../partials/header") %>
+
+<main class="wrap booking-page">
+  <a href="/packages/<%= encodeURIComponent(packageId) %>" class="back-link">
+    ← Back to package
+  </a>
+
+  <section class="booking-card">
+    <div class="booking-heading">
+      <p class="eyebrow">BHAJANKIRTAN</p>
+      <h1>Book a Package</h1>
+      <p>Share your event details to submit a package booking request.</p>
+    </div>
+
+    <form
+      id="packageBookingForm"
+      data-package-id="<%= packageId %>"
+    >
+      <div class="booking-form-grid">
+
+        <div class="form-field">
+          <label for="packageCustomerName">Full Name <span>*</span></label>
+          <input
+            type="text"
+            id="packageCustomerName"
+            name="customerName"
+            placeholder="Enter your full name"
+            autocomplete="name"
+            required
+          >
+        </div>
+
+        <div class="form-field">
+          <label for="packagePhone">Phone Number <span>*</span></label>
+          <input
+            type="tel"
+            id="packagePhone"
+            name="phone"
+            placeholder="Enter your phone number"
+            autocomplete="tel"
+            required
+          >
+        </div>
+
+        <div class="form-field">
+          <label for="packageEmail">Email Address</label>
+          <input
+            type="email"
+            id="packageEmail"
+            name="email"
+            placeholder="Enter your email"
+            autocomplete="email"
+          >
+        </div>
+
+        <div class="form-field">
+          <label for="packageEventType">Event Type <span>*</span></label>
+          <select id="packageEventType" name="eventType" required>
+            <option value="">Select event type</option>
+            <option value="jagrata">Jagrata</option>
+            <option value="mata ki chowki">Mata Ki Chowki</option>
+            <option value="satsang">Satsang</option>
+            <option value="sundarkand">Sundarkand</option>
+            <option value="rudra abhishek">Rudra Abhishek</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-field">
+          <label for="packageEventDate">Event Date <span>*</span></label>
+          <input
+            type="date"
+            id="packageEventDate"
+            name="eventDate"
+            required
+          >
+        </div>
+
+        <div class="form-field">
+          <label for="packageEventTime">Event Time <span>*</span></label>
+          <input
+            type="time"
+            id="packageEventTime"
+            name="eventTime"
+            required
+          >
+        </div>
+
+        <div class="form-field full-width">
+          <label for="packageEventAddress">Event Address <span>*</span></label>
+          <textarea
+            id="packageEventAddress"
+            name="eventAddress"
+            rows="3"
+            placeholder="Enter the complete event address"
+            required
+          ></textarea>
+        </div>
+
+        <div class="form-field">
+          <label for="packageExpectedGuests">Expected Guests</label>
+          <input
+            type="number"
+            id="packageExpectedGuests"
+            name="expectedGuests"
+            min="1"
+            step="1"
+            placeholder="Approximate guest count"
+          >
+        </div>
+
+        <div class="form-field full-width">
+          <label for="packageAdditionalNote">Additional Notes</label>
+          <textarea
+            id="packageAdditionalNote"
+            name="additionalNote"
+            rows="4"
+            placeholder="Any special requirements? (optional)"
+          ></textarea>
+        </div>
+
+      </div>
+
+      <p class="required-note">Fields marked * are compulsory.</p>
+
+      <button
+        type="submit"
+        id="submitPackageBooking"
+        class="btn btn-primary booking-submit"
+      >
+        Submit Booking Request
+      </button>
+
+      <p id="packageBookingError" class="booking-error" role="alert" hidden></p>
+    </form>
+  </section>
+</main>
+
+<!-- Loading spinner -->
+<div id="packageBookingLoader" class="package-booking-loader" hidden>
+  <div class="package-loader-content">
+    <div class="package-spinner"></div>
+    <p>Submitting your booking request...</p>
+    <small>Please wait a moment.</small>
+  </div>
+</div>
+
+<!-- Booking response popup -->
+<div
+  id="packageBookingModal"
+  class="booking-modal"
+  role="dialog"
+  aria-modal="true"
+  aria-labelledby="packageModalTitle"
+  hidden
+>
+  <div class="booking-modal-backdrop"></div>
+
+  <section class="booking-modal-content">
+    <button
+      type="button"
+      id="closePackageBookingModal"
+      class="booking-modal-close"
+      aria-label="Close popup"
+    >&times;</button>
+
+    <p class="eyebrow">BOOKING RESPONSE</p>
+    <h2 id="packageModalTitle">Package Booking Response</h2>
+
+    <!-- Reference ID appears first -->
+    <div id="packageReferenceSection" class="reference-section" hidden>
+      <p>Your Booking Reference ID</p>
+
+      <div class="reference-id-row">
+        <strong id="packageReferenceId"></strong>
+        <button
+          type="button"
+          id="copyPackageReference"
+          class="copy-reference-btn"
+        >
+          Copy ID
+        </button>
+      </div>
+
+      <p id="packageCopyMessage" class="copy-message" aria-live="polite"></p>
+      <p class="reference-help">
+        Save this ID to check your booking status later.
+      </p>
+    </div>
+
+    <div id="packageBookingResponseContent"></div>
+
+    <button
+      type="button"
+      id="packageBackToHome"
+      class="btn btn-primary modal-done-btn"
+    >
+      Back to Home
+    </button>
+  </section>
+</div>
+
+<style>
+  .package-booking-loader[hidden],
+  #packageBookingModal[hidden] {
+    display: none !important;
+  }
+
+  .package-booking-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 10001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(3px);
+    color: white;
+    text-align: center;
+  }
+
+  .package-spinner {
+    width: 55px;
+    height: 55px;
+    margin: 0 auto 18px;
+    border: 5px solid rgba(255, 255, 255, 0.3);
+    border-top-color: var(--crimson, #b42335);
+    border-radius: 50%;
+    animation: packageBookingSpin 0.8s linear infinite;
+  }
+
+  .package-loader-content p {
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  @keyframes packageBookingSpin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .package-response-details {
+    margin: 20px 0;
+    padding: 16px;
+    background: #fff8f5;
+    border-radius: 10px;
+    text-align: left;
+  }
+
+  .package-response-details p {
+    margin: 8px 0;
+    overflow-wrap: anywhere;
+  }
+
+  .package-response-details strong {
+    color: var(--crimson, #b42335);
+  }
+
+  #packageBookingModal .reference-section {
+    overflow-wrap: anywhere;
+  }
+
+  #packageBookingModal .reference-id-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  #packageReferenceId {
+    overflow-wrap: anywhere;
+  }
+
+  #packageBookingModal .modal-done-btn {
+    margin-top: 16px;
+  }
+</style>
+
+<script src="/js/booking-package.js" defer></script>
+
+<%- include("../partials/footer") %>

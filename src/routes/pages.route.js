@@ -100,8 +100,66 @@ router.get("/packages/:id", async (req, res, next) => {
     next(err);
   }
 });
-router.get("/book/performer/:id", page("public/performer-booking-form", "Request Booking"));
-router.get("/book/package/:id", page("public/package-booking-form", "Request Booking"));
+router.get("/book/performer/:id", (req, res) => {
+  res.render("public/booking-performer", {
+    title: "Book Performer | BhajanKirtan",
+    performerId: req.params.id,
+  });
+});
+
+// Submit the booking request.
+router.post("/book/performer/:id", async (req, res, next) => {
+  try {
+    const base = WEB_ROUTE.replace(/\/+$/, "");
+
+    const response = await fetch(
+      `${base}/default/book/performer/${encodeURIComponent(req.params.id)}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(req.body),
+      }
+    );
+
+    const result = await response.json();
+
+    // Return the backend response to the frontend, including errors.
+    res.status(response.status).json(result);
+  } catch (err) {
+    next(err);
+  }
+});
+router.get("/book/package/:id", (req, res) => {
+  res.render("public/booking-package", {
+    title: "Book Package | BhajanKirtan",
+    packageId: req.params.id,
+  });
+});
+
+// Submit package booking
+router.post("/book/package/:id", async (req, res, next) => {
+  try {
+    const base = WEB_ROUTE.replace(/\/+$/, "");
+
+    const response = await fetch(
+      `${base}/book/package/${encodeURIComponent(req.params.id)}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(req.body),
+      }
+    );
+
+    const result = await response.json();
+    res.status(response.status).json(result);
+  } catch (err) {
+    next(err);
+  }
+});
 router.get("/booking-status", page("public/booking-status", "Booking Status"));
 router.get("/contact", page("public/contact", "Contact Us"));
 
