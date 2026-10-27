@@ -39,5 +39,7 @@ Ans) One request per page load fetches every visible performer (admin gets every
 
 • Performer.route.js mei there are three comments which you need to fix, once you IDE's AI is activated again. For now i am ignoring it
 
+• Since the data in the booking table can grow over time, and once the event is completed, you dont need that data anymore, so its better to delete it timely from the db, so that our client do not have to pay in future for those unnecessary datas. So once ask the client about it, at what interval, they want their data to get cleaned: daily, weekly or monthly
+
 
 • Use `upload.fields([{ name: "avatar", maxCount: 1 }, { name: "docs", maxCount: 5 }])` for multiple file fields (or `upload.array("images", 5)` for one field with many files); text fields land in `req.body` and files in `req.files`. And if nothing is there, then use upload.none()
