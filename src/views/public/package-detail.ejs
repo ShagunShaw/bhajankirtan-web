@@ -1,0 +1,96 @@
+
+<%- include("../partials/header") %>
+
+<main class="wrap package-detail-page">
+
+  <a href="/packages" class="back-link">← Back to packages</a>
+
+  <!-- Package heading -->
+  <section class="package-detail-hero">
+    <p class="eyebrow">BHajanKIRTAN PACKAGES</p>
+    <h1><%= pkg.packageName %></h1>
+    <p class="package-description">
+      <%= pkg.description || "Discover the details of this devotional event package." %>
+    </p>
+
+    <div class="package-detail-price">
+      <span>Package price</span>
+      <h2>₹<%= Number(pkg.price || 0).toLocaleString("en-IN") %></h2>
+    </div>
+  </section>
+
+  <!-- Package features -->
+  <% if (pkg.bulletFeatures && pkg.bulletFeatures.length) { %>
+    <section class="package-detail-section">
+      <h2>What's Included</h2>
+
+      <div class="package-features-grid">
+        <% pkg.bulletFeatures.forEach(feature => { %>
+          <div class="package-feature">
+            <span class="feature-check">✓</span>
+            <span><%= feature %></span>
+          </div>
+        <% }) %>
+      </div>
+    </section>
+  <% } %>
+
+  <!-- Package photos -->
+  <% if (pkg.workPhotos && pkg.workPhotos.length) { %>
+    <section class="package-detail-section">
+      <h2>Package Gallery</h2>
+
+      <div class="package-gallery">
+        <% pkg.workPhotos.forEach(photo => { %>
+          <div class="package-gallery-item">
+            <img
+              src="<%= photo %>"
+              alt="<%= pkg.packageName %> event photo"
+              loading="lazy"
+            >
+          </div>
+        <% }) %>
+      </div>
+    </section>
+  <% } %>
+
+  <!-- Package videos -->
+  <% if (pkg.workVideos && pkg.workVideos.length) { %>
+    <section class="package-detail-section">
+      <h2>Watch Our Work</h2>
+
+      <div class="package-video-list">
+        <% pkg.workVideos.forEach(video => { %>
+          <a
+            href="<%= video %>"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="package-video-link"
+          >
+            <span class="video-icon">▶</span>
+            Watch video
+            <span class="video-arrow">↗</span>
+          </a>
+        <% }) %>
+      </div>
+    </section>
+  <% } %>
+
+  <!-- Booking CTA -->
+  <section class="package-booking-cta">
+  <div>
+    <h2>Ready to book this package?</h2>
+    <p>Make your devotional event special with this package.</p>
+  </div>
+
+  <a
+    href="/book/package/<%= encodeURIComponent(pkg._id) %>"
+    class="btn btn-primary"
+  >
+    Book Now →
+  </a>
+</section>
+
+</main>
+
+<%- include("../partials/footer") %>

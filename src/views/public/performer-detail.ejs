@@ -1,0 +1,147 @@
+
+<%- include("../partials/header") %>
+
+<main class="wrap performer-detail-page">
+
+  <a href="/search" class="back-link">← Back to performers</a>
+
+  <!-- Performer profile -->
+  <section class="performer-profile">
+
+    <div class="performer-profile-image">
+      <% if (performer.profilePhoto) { %>
+        <img
+          src="<%= performer.profilePhoto %>"
+          alt="<%= performer.fullName %>"
+        >
+      <% } else { %>
+        <div class="profile-placeholder">🙏</div>
+      <% } %>
+    </div>
+
+    <div class="performer-profile-info">
+      <p class="eyebrow">MEET YOUR PERFORMER</p>
+
+      <h1><%= performer.fullName %></h1>
+
+      <p class="performer-experience">
+        <span>Experience</span>
+        <strong><%= performer.experience || "Not specified" %></strong>
+      </p>
+
+      <div class="performer-tags">
+        <% (performer.tags || []).forEach(tag => { %>
+          <span class="tag">
+            <%= tag.displayName || tag.name %>
+          </span>
+        <% }) %>
+      </div>
+
+      <div class="performer-price">
+        <span>Starting price</span>
+        <h2>
+          ₹<%= Number(performer.basePrice || 0).toLocaleString("en-IN") %>
+        </h2>
+      </div>
+
+      <a
+        href="/book/performer?performerId=<%= encodeURIComponent(performer._id) %>"
+        class="btn btn-primary book-performer-btn"
+      >
+        Book Performer
+      </a>
+    </div>
+
+  </section>
+
+  <!-- About -->
+  <section class="performer-section">
+    <h2>About the Performer</h2>
+
+    <p class="performer-about">
+      <%= performer.about || "More information about this performer will be available soon." %>
+    </p>
+  </section>
+
+  <!-- Work photos -->
+  <% if (performer.workPhotos && performer.workPhotos.length) { %>
+    <section class="performer-section">
+      <h2>Performance Gallery</h2>
+
+      <div class="performer-gallery">
+        <% performer.workPhotos.forEach(photo => { %>
+          <div class="gallery-item">
+            <img src="<%= photo %>" alt="Performance by <%= performer.fullName %>" loading="lazy">
+          </div>
+        <% }) %>
+      </div>
+    </section>
+  <% } %>
+
+  <!-- Work videos -->
+  <% if (performer.workVideoLinks && performer.workVideoLinks.length) { %>
+    <section class="performer-section">
+      <h2>Watch Performances</h2>
+
+      <div class="performer-video-list">
+        <% performer.workVideoLinks.forEach(video => { %>
+          <a
+            href="<%= video %>"
+            class="video-link"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <span class="video-icon">▶</span>
+            Watch performance
+            <span class="video-arrow">↗</span>
+          </a>
+        <% }) %>
+      </div>
+    </section>
+  <% } %>
+
+  <!-- Peak periods -->
+  <% if (performer.peakPeriods && performer.peakPeriods.length) { %>
+    <section class="performer-section">
+      <h2>Peak Season Pricing</h2>
+
+      <div class="peak-period-list">
+        <% performer.peakPeriods.forEach(period => { %>
+          <article class="peak-period-card">
+            <div>
+              <h3><%= period.label %></h3>
+              <p>
+                <%= period.from %> – <%= period.to %>
+              </p>
+            </div>
+
+            <div class="peak-price">
+              <span>Peak price</span>
+              <strong>
+                ₹<%= Number(period.peakPrice || 0).toLocaleString("en-IN") %>
+              </strong>
+            </div>
+          </article>
+        <% }) %>
+      </div>
+    </section>
+  <% } %>
+
+  <!-- Booking CTA -->
+  <section class="performer-booking-cta">
+    <div>
+      <h2>Planning a devotional event?</h2>
+      <p>Book <%= performer.fullName %> for your special occasion.</p>
+    </div>
+
+    <a
+      href="/book/performer?performerId=<%= encodeURIComponent(performer._id) %>"
+      class="btn btn-primary"
+    >
+      Book Performer →
+    </a>
+  </section>
+
+</main>
+
+<%- include("../partials/footer") %>
