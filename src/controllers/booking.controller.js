@@ -120,3 +120,25 @@ export const cancelBooking = async (req, res) => {
         );
     }
 };
+
+export const searchBookings = async (req, res) => {
+    try {
+        const result = await bookingService.searchBookingsService(req.query);
+
+        return res.status(200).json(
+            new apiResponse(200, result.data, result.message)
+        );
+    } catch (error) {
+        if (error instanceof apiError) {
+            return res.status(error.status).json(error);
+        }
+
+        const status = error.status ?? 500;
+        const errName = error.errName ?? error.name ?? "InternalServerError";
+        const errMessage = error.errMessage ?? error.message ?? "An unexpected error occurred";
+
+        return res.status(status).json(
+            new apiError(status, errName, errMessage)
+        );
+    }
+};

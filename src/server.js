@@ -1,5 +1,6 @@
 import "dotenv/config";
 import mongoose from "mongoose";
+import { initBookingCleanupCron } from "./utils/bookingCleanup.cron.js";
 import app from "./app.js";
 
 const PORT = process.env.PORT || 3000;
@@ -15,6 +16,8 @@ const start = async () => {
     try {
         await mongoose.connect(MONGODB_URI);
         console.log("MongoDB connected");
+
+        initBookingCleanupCron();
     } catch (err) {
         console.error("MongoDB connection failed:", err.message);
         process.exit(1);

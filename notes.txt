@@ -39,7 +39,7 @@ Ans) One request per page load fetches every visible performer (admin gets every
 
 • Performer.route.js mei there are three comments which you need to fix, once you IDE's AI is activated again. For now i am ignoring it
 
-• Since the data in the booking table can grow over time, and once the event is completed, you dont need that data anymore, so its better to delete it timely from the db, so that our client do not have to pay in future for those unnecessary datas. So once ask the client about it, at what interval, they want their data to get cleaned: daily, weekly or monthly
+• Since the data in the booking table can grow over time, and once the event is completed, you dont need that data anymore, so its better to delete it timely from the db, so that our client do not have to pay in future for those unnecessary datas. So once ask the client about it, at what interval, they want their data to get cleaned: daily, weekly or monthly. Well we had setup the cron job for this, with RETENTION_DAYS= 45, we can edit this 'RETENTION_DAYS' also, after asking the client that after how many days he wants to clear his booking history.
 
 • Frontend pe we are only handling the case for if everything goes right, but if anything goes not then we need to dispaly a proper mssg with a proper UI for it, so do that also, once all the pages has been done
 

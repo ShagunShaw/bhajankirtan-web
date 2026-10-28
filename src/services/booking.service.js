@@ -3,6 +3,7 @@ import { apiError } from '../utils/apiError.js';
 import { Booking } from "../models/booking.model.js";
 import { istDate } from "../utils/dates.js";
 import { Performer } from "../models/performer.model.js"
+import { Log } from "../models/log.model.js";
 
 
 const STATUSES = ["requested", "confirmed", "rejected", "cancelled", "completed"];
@@ -377,6 +378,111 @@ export const cancelBookingService = async (bookingId, { cancelledBy, reason } = 
     } catch (error) {
         if (error instanceof apiError) throw error;
 
+        throw new apiError(
+            500,
+            error.name || "InternalServerError",
+            error.message || "An unexpected error occurred"
+        );
+    }
+};
+
+export const searchBookingsService = async (query = {}) => {
+    try {
+        const { fromDate, toDate, performerId, status, packageId } = query;
+        const page = Math.max(1, parseInt(query.page, 10) || 1);
+        const limit = Math.min(100, Math.max(1, parseInt(query.limit, 10) || 20));
+        const skip = (page - 1) * limit;
+        const filter = {};
+        // 1. Date range filter
+        if (fromDate || toDate) {
+            filter.eventDate = {};
+            if (fromDate) {
+                const start = new Date(fromDate);
+                if (isNaN(start.getTime())) throw new apiError(400, "Validation Error", "Invalid fromDate format");
+                start.setHours(0, 0, 0, 0);
+                filter.eventDate.$gte = start;
+            }
+            if (toDate) {
+                const end = new Date(toDate);
+                if (isNaN(end.getTime())) throw new apiError(400, "Validation Error", "Invalid toDate format");
+                end.setHours(23, 59, 59, 999);
+                filter.eventDate.$lte = end;
+            }
+        }
+        // 2. Status filter
+        if (status && typeof status === "string") {
+            const validStatuses = ["requested", "confirmed", "completed", "cancelled"];
+            if (!validStatuses.includes(status)) {
+                throw new apiError(400, "Validation Error", `Invalid status. Must be one of: ${validStatuses.join(", ")}`);
+            }
+            filter.status = status;
+        }
+        // 3. Performer filter (requestedPerformer or allotted)
+        if (performerId) {
+            if (!mongoose.isValidObjectId(performerId)) {
+                throw new apiError(400, "Validation Error", "Invalid performerId");
+            }
+            filter.$or = [
+                { requestedPerformer: performerId },
+                { "allotments.performer": performerId }
+            ];
+        }
+        // 4. Package filter
+        if (packageId) {
+            if (!mongoose.isValidObjectId(packageId)) {
+                throw new apiError(400, "Validation Error", "Invalid packageId");
+            }
+            filter.package = packageId;
+        }
+        // Execute query & count in parallel
+        const [bookings, total] = await Promise.all([
+            Booking.find(filter)
+                .populate("requestedPerformer", "fullName profilePhoto")
+                .populate("package", "packageName")
+                .sort({ eventDate: -1 })
+                .skip(skip)
+                .limit(limit)
+                .lean(),
+            Booking.countDocuments(filter)
+        ]);
+        // If results exist, return normally
+        if (bookings.length > 0) {
+            return {
+                data: {
+                    bookings,
+                    pagination: { total, page, limit, totalPages: Math.ceil(total / limit) },
+                    cleanedUp: false
+                },
+                message: "Bookings fetched successfully"
+            };
+        }
+        // If no results, check 1-row Log model for cleanup cutoff date
+        const cleanupLog = await Log.findOne({ key: "booking_cleanup" }).lean();
+        const cutoffDate = cleanupLog?.lastCleanedUpBeforeDate;
+        // Determine if the search window falls prior to the cleanup cutoff date
+        const queriedDate = toDate ? new Date(toDate) : (fromDate ? new Date(fromDate) : null);
+        if (cutoffDate && queriedDate && queriedDate < cutoffDate) {
+            const formattedDate = cutoffDate.toISOString().split("T")[0];
+            return {
+                data: {
+                    bookings: [],
+                    pagination: { total: 0, page, limit, totalPages: 0 },
+                    cleanedUp: true,
+                    cleanupDate: formattedDate
+                },
+                message: `Bookings before ${formattedDate} have been removed from the database`
+            };
+        }
+        return {
+            data: {
+                bookings: [],
+                pagination: { total: 0, page, limit, totalPages: 0 },
+                cleanedUp: false
+            },
+            message: "No bookings found matching the selected criteria"
+        };
+    } catch (error) {
+        if (error instanceof apiError) throw error;
         throw new apiError(
             500,
             error.name || "InternalServerError",
