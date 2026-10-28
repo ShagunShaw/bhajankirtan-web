@@ -17,6 +17,11 @@ const tagSchema = new Schema(
       type: String, 
       trim: true, 
       maxlength: 40 
+    },
+    count: {
+      type: Number,
+      default: 0,
+      min: 0
     }
   },
   { timestamps: true }

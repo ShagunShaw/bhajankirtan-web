@@ -36,6 +36,10 @@ const performerSchema = new Schema(
         validate: maxItems(10) 
 
     },
+    workVideos: {
+        type: [String],
+        validate: maxItems(5)
+    },
     workVideoLinks: [String],
     profilePhoto: { 
         type: String 

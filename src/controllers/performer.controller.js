@@ -50,7 +50,7 @@ export const getPerformerById = async (req, res) => {
 
 export const createPerformer = async (req, res) => {
     try {
-        const performer = await performerService.createPerformerService(req.body);
+        const performer = await performerService.createPerformerService(req.body, req.files);
 
         return res.status(201).json(
             new apiResponse(201, performer, "Performer created successfully")
@@ -74,7 +74,7 @@ export const updatePerformer = async (req, res) => {
     try {
         const { performerId } = req.params;
 
-        const updated = await performerService.updatePerformerService(performerId, req.body);
+        const updated = await performerService.updatePerformerService(performerId, req.body, req.files);
 
         return res.status(200).json(
             new apiResponse(200, updated, "Performer updated successfully")

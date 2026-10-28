@@ -45,3 +45,11 @@ export const uploadPackageMedia = upload.fields([
     { name: "workPhotos", maxCount: 15 },
     { name: "workVideos", maxCount: 5 }
 ]);
+
+// Reusable multer fields configuration for performer uploads
+export const uploadPerformerMedia = upload.fields([
+    { name: "profilePhoto", maxCount: 1 },
+    { name: "workPhotos", maxCount: 10 },
+    { name: "workVideos", maxCount: 5 }
+]);
+

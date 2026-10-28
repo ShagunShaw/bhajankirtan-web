@@ -27,5 +27,6 @@ router.post("/final-amount/:bookingId", verifyJWT, upload.none(), bookingControl
 
 router.post("/cancel/:bookingId", verifyJWT, upload.none(), bookingController.cancelBooking);     // Checked
 
+// For Bookings, if admin wants a booking of a certain date/date_Range, performer, etc. then there will be another route called "/serach" with query params so that we can fetch it directly from the db. But again, later we will set up a cron job (not now), in this, where 'completed' bookings of more than a month will be automatically deleted from the db, so instead of howing the admin, "booking not found", we have to display a proper mssg "bookings before this date: <date> has been removed from the db"
 
 export default router;

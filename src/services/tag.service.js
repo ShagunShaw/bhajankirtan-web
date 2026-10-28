@@ -3,10 +3,19 @@ import { apiError } from "../utils/apiError.js";
 
 const MAX_TAGS = 10;
 
-// Accepts an array of names or a comma-separated string.
+// Accepts an array of names, a JSON string, or a comma-separated string.
 // Returns [[normalizedName, displayName], ...] with duplicates removed.
 const parseTags = (input) => {
-  const raw = Array.isArray(input) ? input : typeof input === "string" ? input.split(",") : null;
+  let raw = input;
+  if (typeof raw === "string") {
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) raw = parsed;
+    } catch {
+      // not a JSON string, fall through to comma-separated split
+    }
+  }
+  raw = Array.isArray(raw) ? raw : typeof raw === "string" ? raw.split(",") : null;
   if (!raw) throw new apiError(400, "Validation Error", "Tags must be a list of tag names");
 
   const seen = new Map();
@@ -30,7 +39,7 @@ const getOrCreateTag = async (name, displayName) => {
   try {
     return await Tag.findOneAndUpdate(
       { name },
-      { $setOnInsert: { displayName } },
+      { $setOnInsert: { displayName, count: 0 } },
       { upsert: true, new: true }
     );
   } catch (err) {
@@ -58,9 +67,39 @@ export const resolveTagIds = async (input) => {
   }
 };
 
+// Increment count for tags associated with a performer
+export const incrementTagCounts = async (tagIds = []) => {
+  try {
+    if (!tagIds || tagIds.length === 0) return;
+    await Tag.updateMany(
+      { _id: { $in: tagIds } },
+      { $inc: { count: 1 } }
+    );
+  } catch (error) {
+    console.error("Error incrementing tag counts:", error);
+  }
+};
+
+// Decrement count for tags and remove tags whose count reaches 0 or less
+export const decrementTagCounts = async (tagIds = []) => {
+  try {
+    if (!tagIds || tagIds.length === 0) return;
+    await Tag.updateMany(
+      { _id: { $in: tagIds } },
+      { $inc: { count: -1 } }
+    );
+    await Tag.deleteMany({
+      _id: { $in: tagIds },
+      count: { $lte: 0 }
+    });
+  } catch (error) {
+    console.error("Error decrementing tag counts:", error);
+  }
+};
+
 export const getAllTagsForAdmin = async (input) => {
   try {
-    const tags= Tag.find().select("name displayName").sort({ name: 1 }).lean();
+    const tags = await Tag.find().select("name displayName count").sort({ name: 1 }).lean();
 
     return tags;
   } catch (error) {
