@@ -21,7 +21,7 @@ router.post("/book/performer/:performerId", upload.none(), defaultController.boo
 router.post("/book/package/:packageId", upload.none(), defaultController.bookPackage)       // Checked
 
 // Will be applicable for both package and performer booking
-router.get("/booking/status", upload.none(), defaultController.getBookingStatus)        // Checked
+router.post("/booking/status", upload.none(), defaultController.getBookingStatus)        // Checked
 
 
 export default router;

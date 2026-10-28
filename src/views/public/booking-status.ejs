@@ -1,0 +1,148 @@
+<%- include("../partials/header") %>
+
+<main class="wrap booking-page">
+  <a href="/" class="back-link">← Back to Home</a>
+
+  <section class="booking-card">
+    <div class="booking-heading">
+      <p class="eyebrow">BHAJANKIRTAN</p>
+      <h1>Check Booking Status</h1>
+      <p>Enter your booking reference ID and registered phone number.</p>
+    </div>
+
+    <form id="bookingStatusForm">
+      <div class="booking-form-grid">
+        <div class="form-field full-width">
+          <label for="refId">Booking Reference ID <span>*</span></label>
+          <input type="text" id="refId" name="refId"
+            placeholder="e.g. BK-441670OH8" required autocomplete="off">
+        </div>
+
+        <div class="form-field full-width">
+          <label for="phone">Phone Number <span>*</span></label>
+          <input type="tel" id="phone" name="phone"
+            placeholder="Enter the phone number used for booking"
+            autocomplete="tel" required>
+        </div>
+      </div>
+
+      <p class="required-note">Fields marked * are compulsory.</p>
+
+      <button type="submit" id="checkBookingStatus"
+        class="btn btn-primary booking-submit">
+        Send
+      </button>
+
+      <p id="statusFormError" class="booking-error" role="alert" hidden></p>
+    </form>
+  </section>
+</main>
+
+<!-- Loading spinner -->
+<div id="statusLoader" class="status-loader" hidden>
+  <div class="status-loader-content">
+    <div class="status-spinner"></div>
+    <p>Checking your booking...</p>
+    <small>Please wait a moment.</small>
+  </div>
+</div>
+
+<!-- Response popup -->
+<div id="statusModal" class="booking-modal" role="dialog"
+  aria-modal="true" aria-labelledby="statusModalTitle" hidden>
+  <div class="booking-modal-backdrop"></div>
+
+  <section class="booking-modal-content">
+    <button type="button" id="closeStatusModal"
+      class="booking-modal-close" aria-label="Close popup">&times;</button>
+
+    <p class="eyebrow">BOOKING STATUS</p>
+    <h2 id="statusModalTitle">Booking Details</h2>
+
+    <div id="statusSummary"></div>
+
+    <button type="button" id="statusBackHome"
+      class="btn btn-primary modal-done-btn">
+      Back to Home
+    </button>
+  </section>
+</div>
+
+<style>
+  .status-loader[hidden],
+  #statusModal[hidden] {
+    display: none !important;
+  }
+
+  .status-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 10001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.65);
+    backdrop-filter: blur(3px);
+    color: white;
+    text-align: center;
+  }
+
+  .status-spinner {
+    width: 55px;
+    height: 55px;
+    margin: 0 auto 18px;
+    border: 5px solid rgba(255, 255, 255, 0.3);
+    border-top-color: var(--crimson, #b42335);
+    border-radius: 50%;
+    animation: statusSpin 0.8s linear infinite;
+  }
+
+  .status-loader-content p {
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+
+  @keyframes statusSpin {
+    to { transform: rotate(360deg); }
+  }
+
+  .status-result-card {
+    margin: 18px 0;
+    padding: 16px;
+    border-radius: 10px;
+    background: #fff8f5;
+    text-align: left;
+    overflow-wrap: anywhere;
+  }
+
+  .status-result-card p {
+    margin: 9px 0;
+  }
+
+  .status-result-card strong {
+    color: var(--crimson, #b42335);
+  }
+
+  .status-result-card .status-reference {
+    font-size: 20px;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+
+  .status-result-card .status-badge {
+    display: inline-block;
+    padding: 5px 10px;
+    border-radius: 20px;
+    background: #f3e3c9;
+    font-weight: 600;
+  }
+
+  #statusModal .modal-done-btn {
+    margin-top: 12px;
+  }
+</style>
+
+<script src="/js/booking-status.js" defer></script>
+
+<%- include("../partials/footer") %>

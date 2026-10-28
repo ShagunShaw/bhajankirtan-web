@@ -160,7 +160,53 @@ router.post("/book/package/:id", async (req, res, next) => {
     next(err);
   }
 });
-router.get("/booking-status", page("public/booking-status", "Booking Status"));
+router.get("/booking-status", (req, res) => {
+  res.render("public/booking-status", {
+    title: "Booking Status | BhajanKirtan",
+  });
+});
+
+router.post("/booking-status/check", async (req, res) => {
+  try {
+    const { refId, phone } = req.body || {};
+
+    if (
+      typeof refId !== "string" || !refId.trim() ||
+      typeof phone !== "string" || !phone.trim()
+    ) {
+      return res.status(400).json({
+        success: false,
+        errName: "Validation Error",
+        errMessage: "Reference ID and phone number are required.",
+      });
+    }
+
+    const base = WEB_ROUTE.replace(/\/+$/, "");
+
+    const response = await fetch(`${base}/default/booking/status`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        refId: refId.trim(),
+        phone: phone.trim(),
+      }),
+    });
+
+    const result = await response.json();
+    return res.status(response.status).json(result);
+
+  } catch (error) {
+    console.error("Booking status lookup failed:", error.message);
+
+    return res.status(500).json({
+      success: false,
+      errName: "Internal Server Error",
+      errMessage: "Something went wrong while checking your booking. Please try again later.",
+    });
+  }
+});
 router.get("/contact", page("public/contact", "Contact Us"));
 
 /* Admin pages: HTML only. All data comes from the JWT-protected /api/admin routes,
