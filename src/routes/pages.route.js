@@ -10,7 +10,7 @@ const requireAdmin = async (req, res, next) => {
     const base = WEB_ROUTE.replace(/\/+$/, "");
 
     // Set this to an existing GET endpoint protected by verifyJWT.
-    const checkPath = process.env.ADMIN_AUTH_CHECK_PATH;      // What is the value
+    const checkPath = process.env.ADMIN_AUTH_CHECK_PATH;
 
     if (!checkPath) {
       return res.status(500).send("Admin authentication endpoint is not configured.");
@@ -255,8 +255,6 @@ router.use("/admin", (req, res, next) => {
   next();
 });
 
-router.use("/admin", requireAdmin);
-
 
 router.get("/admin/login", (req, res) => {
   res.render("public/admin-login", {
@@ -313,7 +311,48 @@ router.post("/admin/login", async (req, res) => {
   }
 });
 
-router.get("/admin/dashboard", page("admin/dashboard", "Dashboard", { active: "dashboard" }));
+router.use("/admin", requireAdmin);
+
+router.get("/admin", (req, res) => {
+  res.redirect("/admin/dashboard");
+});
+
+router.get(
+  "/admin/dashboard",
+  page("admin/dashboard", "Dashboard | BhajanKirtan", {
+    active: "dashboard",
+  })
+);
+
+Some buttons in the dashboard page are left to be mapped with their respective backedn route like 'markReconfirm', 'reAllot', "Cancel Booking", will continue this later
+router.get("/admin/dashboard/data", async (req, res) => {
+  try {
+    const base = WEB_ROUTE.replace(/\/+$/, "");
+
+    const response = await fetch(`${base}/admin/dashboard`, {
+      method: "GET",
+      headers: {
+        Cookie: req.headers.cookie || "",
+        Accept: "application/json",
+      },
+    });
+
+    const setCookies = response.headers.getSetCookie?.() || [];
+    for (const cookie of setCookies) {
+      res.append("Set-Cookie", cookie);
+    }
+
+    const result = await response.json();
+    return res.status(response.status).json(result);
+  } catch (error) {
+    console.error("Dashboard data fetch failed:", error.message);
+
+    return res.status(502).json({
+      success: false,
+      message: "Unable to load dashboard data.",
+    });
+  }
+});
 router.get("/admin/bookings", page("admin/bookings", "Bookings", { active: "bookings" }));
 router.get("/admin/performers", page("admin/performers", "Performers", { active: "performers" }));
 router.get("/admin/performers/new", page("admin/performer-new", "Add Performer", { active: "performers" }));

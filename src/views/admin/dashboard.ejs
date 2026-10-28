@@ -1,45 +1,87 @@
-<%- include('../partials/admin-header', { title, active }) %>
-<h1>Dashboard</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %></title>
 
-<div class="stat-grid">
-  <div class="stat"><strong><%= stats.total %></strong>Total bookings</div>
-  <div class="stat"><strong><%= stats.pending %></strong>Pending requests</div>
-  <div class="stat"><strong><%= stats.upcoming %></strong>Upcoming confirmed</div>
-</div>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/admin-dashboard.css">
+  <script src="/js/admin-dashboard.js" defer></script>
+</head>
+<body>
 
-<div class="panel-grid">
-  <div class="panel today">
-    <h2>📅 Today's Events (<%= today.length %>)</h2>
-    <% if (today.length === 0) { %><p class="muted">No events today.</p><% } %>
-    <% today.forEach(b => { %>
-      <div class="reminder">
-        <div class="row"><strong><%= b.event %> at <%= b.time %></strong><span><%= b.ref %></span></div>
-        <div>Performer: <%= b.performer %></div>
-        <div>Customer: <%= b.customer %></div>
-        <div>📞 Customer phone: <strong><%= b.phone %></strong></div>
-        <div>📍 <%= b.location %></div>
+  <%- include("../partials/admin-header") %>
+
+  <main class="admin-wrap">
+    <div class="page-head">
+      <div>
+        <h1>Namaste, Admin 🙏</h1>
+        <p>Here is what needs your attention today.</p>
       </div>
-    <% }) %>
-  </div>
+      <span class="today-date" id="todayDate">Loading date...</span>
+    </div>
 
-  <div class="panel tomorrow">
-    <h2>⏰ Tomorrow's Events (<%= tomorrow.length %>)</h2>
-    <% if (tomorrow.length === 0) { %><p class="muted">No events tomorrow.</p><% } %>
-    <% tomorrow.forEach(b => { %>
-      <div class="reminder <%= b.reconfirmed ? '' : 'warn' %>">
-        <div class="row">
-          <strong><%= b.event %> at <%= b.time %></strong>
-          <span class="pill <%= b.reconfirmed ? 'yes' : 'no' %>"><%= b.reconfirmed ? 'Reconfirmed' : 'Not reconfirmed' %></span>
-        </div>
-        <div>Performer: <%= b.performer %></div>
-        <div>Customer: <%= b.customer %> (<%= b.phone %>)</div>
-        <div>📍 <%= b.location %></div>
-        <div class="actions">
-          <button class="btn-xs green">Mark reconfirmed</button>
-          <a class="btn-xs grey" href="/admin/bookings">Reallot</a>
+    <div class="stats">
+      <div class="stat">
+        <div class="ico">📖</div>
+        <div>
+          <b id="cTotal">—</b>
+          <span>Total Bookings</span>
         </div>
       </div>
-    <% }) %>
-  </div>
-</div>
-<%- include('../partials/admin-footer') %>
+
+      <div class="stat warn">
+        <div class="ico">⏳</div>
+        <div>
+          <b id="cPending">—</b>
+          <span>Pending Requests</span>
+        </div>
+      </div>
+
+      <div class="stat">
+        <div class="ico">🪔</div>
+        <div>
+          <b id="cUpcoming">—</b>
+          <span>Upcoming Confirmed</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="cols">
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Tomorrow's Events</h2>
+            <small id="tomorrowDate"></small>
+          </div>
+          <span class="count" id="tomorrowCount">0</span>
+        </div>
+        <div class="list" id="tomorrowList">
+          <div class="loading">Loading events...</div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <div>
+            <h2>Today's Events</h2>
+            <small id="todayDate2"></small>
+          </div>
+          <span class="count" id="todayCount">0</span>
+        </div>
+        <div class="list" id="todayList">
+          <div class="loading">Loading events...</div>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <div id="toast" role="status" aria-live="polite"></div>
+
+  <%- include("../partials/admin-footer") %>
+
+</body>
+</html>
