@@ -15,6 +15,7 @@ import performerRoutes from "./routes/performer.route.js";
 import packageRoutes from "./routes/package.route.js";
 import bookingRoutes from "./routes/booking.route.js";
 import priceRoutes from "./routes/price.route.js";
+import { verifyJWT } from "./middlewares/verifyJWT.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const isProd = process.env.NODE_ENV === "production";
@@ -74,6 +75,27 @@ app.use(express.static(path.join(__dirname, "../public"), { maxAge: isProd ? "1h
 app.get("/health", (req, res) => {
   const dbUp = mongoose.connection.readyState === 1;
   res.status(dbUp ? 200 : 503).json({ status: dbUp ? "ok" : "db-down" });
+});
+
+
+const jwtCheckLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  limit: 450,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: {
+    success: false,
+    statusCode: 429,
+    message: "Too many authentication checks. Please try again later.",
+  },
+});
+
+// For frontend JWT check
+app.get("/api/check-JWT", jwtCheckLimiter, verifyJWT, (req, res) => {
+  return res.status(200).json({
+    success: true,
+    message: "JWT verified successfully",
+  });
 });
 
 /* ---------- Rate limits ---------- */

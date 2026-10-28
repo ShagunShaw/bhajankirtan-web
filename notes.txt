@@ -45,4 +45,8 @@ Ans) One request per page load fetches every visible performer (admin gets every
 
 • check on frontend price lsiting part, ki kisi performer k peakPice k time pe hamara website uss performer ka basePrice na show krra ho, and from backend we are sending the response correctly do dw about it
 
+• Once check that all the admins routes in frontend are not access without proper authentication
+
+• Cookie security: You're using httpOnly, secure in production, and sameSite. Good. We should also verify HTTPS is enforced in production and assess CSRF protection for state-changing requests.
+
 • Use `upload.fields([{ name: "avatar", maxCount: 1 }, { name: "docs", maxCount: 5 }])` for multiple file fields (or `upload.array("images", 5)` for one field with many files); text fields land in `req.body` and files in `req.files`. And if nothing is there, then use upload.none()

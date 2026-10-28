@@ -5,6 +5,45 @@ const page = (view, title, extra = {}) => (req, res) => res.render(view, { title
 
 const WEB_ROUTE = process.env.NODE_ENV === 'production' ? process.env.WEB_ROUTE : `http://localhost:${process.env.PORT}/api/`
 
+const requireAdmin = async (req, res, next) => {
+  try {
+    const base = WEB_ROUTE.replace(/\/+$/, "");
+
+    // Set this to an existing GET endpoint protected by verifyJWT.
+    const checkPath = process.env.ADMIN_AUTH_CHECK_PATH;      // What is the value
+
+    if (!checkPath) {
+      return res.status(500).send("Admin authentication endpoint is not configured.");
+    }
+
+    const response = await fetch(`${base}${checkPath}`, {
+      method: "GET",
+      headers: {
+        Cookie: req.headers.cookie || "",
+      },
+    });
+
+    // Preserve refreshed cookies if the backend renews the access token.
+    const setCookies = response.headers.getSetCookie?.() || [];
+    for (const cookie of setCookies) {
+      res.append("Set-Cookie", cookie);
+    }
+
+    if (response.status === 401 || response.status === 403) {
+      return res.redirect("/admin/login");
+    }
+
+    if (!response.ok) {
+      return res.status(502).send("Unable to verify admin session.");
+    }
+
+    next();
+  } catch (error) {
+    console.error("Admin authentication check failed:", error.message);
+    return res.status(502).send("Unable to verify admin session.");
+  }
+};
+
 /* Customer pages */
 router.get("/", async (req, res, next) => {
   try {
@@ -43,7 +82,7 @@ router.get("/", async (req, res, next) => {
     next(err);
   }
 });
-router.get("/search", page("public/performers", "Find Performers"));
+router.get("/search", page("public/performers", "Find Performers"));      // This route is not JWT protected
 router.get("/performers/:id", async (req, res, next) => {
   try {
     const base = WEB_ROUTE.replace(/\/+$/, "");
@@ -207,7 +246,7 @@ router.post("/booking-status/check", async (req, res) => {
     });
   }
 });
-router.get("/contact", page("public/contact", "Contact Us"));
+router.get("/contact", page("public/contact", "Contact Us"));     // This route is not JWT protected
 
 /* Admin pages: HTML only. All data comes from the JWT-protected /api/admin routes,
    so an admin page opened without logging in shows no data. */
@@ -215,8 +254,66 @@ router.use("/admin", (req, res, next) => {
   res.set("X-Robots-Tag", "noindex, nofollow");
   next();
 });
-router.get("/admin/login", page("admin/login", "Admin Login"));
-router.get("/admin", page("admin/dashboard", "Dashboard", { active: "dashboard" }));
+
+router.use("/admin", requireAdmin);
+
+
+router.get("/admin/login", (req, res) => {
+  res.render("public/admin-login", {
+    title: "Admin Login | BhajanKirtan",
+  });
+});
+
+router.post("/admin/login", async (req, res) => {
+  try {
+    const { username, email, password } = req.body || {};
+
+    if (
+      (!username && !email) ||
+      typeof password !== "string" ||
+      !password
+    ) {
+      return res.status(400).json({
+        success: false,
+        errName: "Validation Error",
+        errMessage: "Username or email and password are required.",
+      });
+    }
+
+    const base = WEB_ROUTE.replace(/\/+$/, "");
+
+    const response = await fetch(`${base}/admin/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        username: username || "",
+        email: email || "",
+        password,
+      }),
+    });
+
+    // Forward authentication cookies, if the backend sets any.
+    const setCookies = response.headers.getSetCookie?.() || [];
+    for (const cookie of setCookies) {
+      res.append("Set-Cookie", cookie);
+    }
+
+    const result = await response.json();
+    return res.status(response.status).json(result);
+  } catch (error) {
+    console.error("Admin login failed:", error.message);
+
+    return res.status(500).json({
+      success: false,
+      errName: "Internal Server Error",
+      errMessage: "Unable to log in right now. Please try again later.",
+    });
+  }
+});
+
+router.get("/admin/dashboard", page("admin/dashboard", "Dashboard", { active: "dashboard" }));
 router.get("/admin/bookings", page("admin/bookings", "Bookings", { active: "bookings" }));
 router.get("/admin/performers", page("admin/performers", "Performers", { active: "performers" }));
 router.get("/admin/performers/new", page("admin/performer-new", "Add Performer", { active: "performers" }));

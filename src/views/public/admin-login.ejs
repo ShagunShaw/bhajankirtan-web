@@ -1,0 +1,262 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin Login | BhajanKirtan</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --crimson: #7a1022;
+      --crimson-dark: #52091a;
+      --gold: #d4a437;
+      --gold-soft: #f1d58a;
+      --ivory: #fff8ec;
+      --paper: #fffdf7;
+      --text: #3b2326;
+      --muted: #85686b;
+      --line: #ecd9b4;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      font-family: Mukta, sans-serif;
+      background: var(--ivory);
+      color: var(--text);
+    }
+
+    header {
+      background: var(--crimson-dark);
+      border-bottom: 2px solid var(--gold);
+      padding: 17px 24px;
+    }
+
+    .logo {
+      display: block;
+      text-align: center;
+      font-family: "Rozha One", serif;
+      font-size: 1.9rem;
+      color: white;
+    }
+
+    .logo b {
+      color: #f59e0b;
+      font-weight: 400;
+    }
+
+    .logo small {
+      display: block;
+      font: 600 0.7rem Mukta, sans-serif;
+      letter-spacing: 3px;
+      color: var(--gold-soft);
+      text-transform: uppercase;
+    }
+
+    main {
+      flex: 1;
+      display: grid;
+      place-items: center;
+      padding: 40px 18px;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 440px;
+      padding: 36px;
+      background: var(--paper);
+      border: 3px double var(--gold);
+      border-radius: 16px;
+      box-shadow: 0 12px 35px rgba(82, 9, 26, 0.08);
+    }
+
+    .eyebrow {
+      color: var(--muted);
+      text-align: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+
+    h1 {
+      margin: 8px 0;
+      text-align: center;
+      font: 400 2rem "Rozha One", serif;
+      color: var(--crimson);
+    }
+
+    .subtitle {
+      text-align: center;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+
+    .form-field {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 7px;
+      font-weight: 700;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px 14px;
+      border: 1.5px solid var(--line);
+      border-radius: 7px;
+      background: white;
+      font: inherit;
+      color: var(--text);
+      outline: none;
+    }
+
+    input:focus {
+      border-color: var(--crimson);
+      box-shadow: 0 0 0 3px rgba(122, 16, 34, 0.09);
+    }
+
+    .password-wrap {
+      position: relative;
+    }
+
+    .password-wrap input {
+      padding-right: 75px;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 0;
+      background: transparent;
+      color: var(--crimson);
+      font: 700 0.85rem Mukta, sans-serif;
+      cursor: pointer;
+    }
+
+    .login-button {
+      width: 100%;
+      margin-top: 5px;
+      padding: 12px;
+      border: 1.5px solid var(--gold);
+      border-radius: 7px;
+      background: var(--crimson);
+      color: white;
+      font: 700 1rem Mukta, sans-serif;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .login-button:hover {
+      background: var(--crimson-dark);
+    }
+
+    .login-button:disabled {
+      opacity: 0.7;
+      cursor: wait;
+    }
+
+    .login-error {
+      margin-bottom: 16px;
+      padding: 10px 12px;
+      border: 1px solid #e6aaaa;
+      border-radius: 7px;
+      background: #fff0f0;
+      color: #a51d24;
+      font-size: 0.9rem;
+    }
+
+    .login-error[hidden] {
+      display: none;
+    }
+
+    footer {
+      padding: 16px;
+      border-top: 1px solid var(--gold);
+      background: var(--crimson-dark);
+      color: var(--gold-soft);
+      text-align: center;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 480px) {
+      .login-card {
+        padding: 26px 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <a href="/admin/login" class="logo">
+      Bhajan<b>Kirtan</b>
+      <small>Admin Portal</small>
+    </a>
+  </header>
+
+  <main>
+    <section class="login-card">
+      <p class="eyebrow">RESTRICTED ACCESS</p>
+      <h1>Admin Login</h1>
+      <p class="subtitle">Sign in to manage BhajanKirtan.</p>
+
+      <form id="adminLoginForm">
+        <div class="form-field">
+          <label for="identifier">Username or email</label>
+          <input
+            type="text"
+            id="identifier"
+            name="identifier"
+            placeholder="Enter your username or email"
+            autocomplete="username"
+            required
+          >
+        </div>
+
+        <div class="form-field">
+          <label for="password">Password</label>
+          <div class="password-wrap">
+            <input
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Enter your password"
+              autocomplete="current-password"
+              required
+            >
+            <button type="button" class="toggle-password"
+              id="togglePassword">Show</button>
+          </div>
+        </div>
+
+        <p id="loginError" class="login-error" role="alert" hidden></p>
+
+        <button type="submit" id="loginButton" class="login-button">
+          Login
+        </button>
+      </form>
+    </section>
+  </main>
+
+  <footer>
+    BhajanKirtan Admin Portal
+  </footer>
+
+  <script src="/js/admin-login.js" defer></script>
+</body>
+</html>
