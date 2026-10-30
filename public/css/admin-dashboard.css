@@ -1,3 +1,4 @@
+
 :root {
   --crimson: #7a1022;
   --crimson-dark: #52091a;
@@ -219,7 +220,7 @@ a {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 26px;
-  padding-bottom: 45px;
+  padding-bottom: 35px;
   align-items: start;
 }
 
@@ -228,6 +229,7 @@ a {
   border: 3px double var(--gold);
   border-radius: 16px;
   overflow: hidden;
+  min-width: 0;
 }
 
 .panel-head {
@@ -264,10 +266,31 @@ a {
   place-items: center;
 }
 
+/* Independent section scrolling */
 .list {
   padding: 14px;
   display: grid;
   gap: 14px;
+  max-height: 58vh;
+  min-height: 220px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--gold) var(--ivory);
+}
+
+.list::-webkit-scrollbar {
+  width: 7px;
+}
+
+.list::-webkit-scrollbar-track {
+  background: var(--ivory);
+  border-radius: 10px;
+}
+
+.list::-webkit-scrollbar-thumb {
+  background: var(--gold);
+  border-radius: 10px;
 }
 
 /* Booking cards */
@@ -284,7 +307,15 @@ a {
   justify-content: space-between;
   align-items: flex-start;
   gap: 10px;
-  margin-bottom: 8px;
+  margin-bottom: 12px;
+}
+
+.bk-top-tags {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 7px;
+  flex-shrink: 0;
 }
 
 .ref {
@@ -292,6 +323,11 @@ a {
   color: var(--crimson);
   font-size: 0.95rem;
   letter-spacing: 0.5px;
+  overflow-wrap: anywhere;
+}
+
+.bk h3 {
+  font-size: 1.2rem;
   overflow-wrap: anywhere;
 }
 
@@ -305,9 +341,25 @@ a {
   white-space: nowrap;
 }
 
-.bk h3 {
-  font-size: 1.2rem;
-  overflow-wrap: anywhere;
+.booking-type {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.6px;
+  padding: 3px 11px;
+  border-radius: 999px;
+  border: 1px solid;
+}
+
+.booking-type.solo {
+  color: #245b85;
+  background: #e8f3fc;
+  border-color: #a9cce8;
+}
+
+.booking-type.package {
+  color: var(--crimson);
+  background: #f9e8ed;
+  border-color: #e5b4c1;
 }
 
 .meta {
@@ -321,11 +373,52 @@ a {
   font-weight: 600;
 }
 
+.booking-details {
+  display: grid;
+  gap: 4px;
+}
+
+.status-text {
+  display: inline-block;
+  font-weight: 700;
+  text-transform: capitalize;
+}
+
+.status-text.pending {
+  color: #b66b00;
+}
+
+.status-text.confirmed {
+  color: var(--green);
+}
+
+.booking-note {
+  margin-top: 7px;
+  padding: 9px 11px;
+  background: var(--ivory);
+  border-left: 3px solid var(--gold);
+  border-radius: 5px;
+  font-size: 0.85rem;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.booking-note b {
+  color: var(--text);
+}
+
 .perfs {
   display: flex;
   flex-wrap: wrap;
   gap: 6px;
-  margin: 10px 0 14px;
+  align-items: center;
+  margin: 12px 0 14px;
+}
+
+.performer-heading {
+  width: 100%;
+  font-size: 0.85rem;
+  color: var(--text);
 }
 
 .perf-chip {
@@ -340,6 +433,7 @@ a {
   overflow-wrap: anywhere;
 }
 
+/* Actions */
 .actions {
   display: flex;
   flex-wrap: wrap;
@@ -359,6 +453,16 @@ a {
   cursor: pointer;
   transition: 0.2s;
   background: transparent;
+}
+
+.btn-confirm {
+  background: var(--green-bg);
+  color: var(--green);
+  border-color: #9fd5b3;
+}
+
+.btn-confirm:hover {
+  background: #c8ebd5;
 }
 
 .btn-reconfirm {
@@ -400,6 +504,7 @@ a {
   border: 1.5px solid #9fd5b3;
 }
 
+/* Empty and loading states */
 .empty,
 .loading,
 .error-state {
@@ -411,6 +516,71 @@ a {
 .empty span {
   display: block;
   font-size: 2rem;
+}
+
+/* Package popup */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: rgba(35, 10, 15, 0.65);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.modal-overlay.show {
+  display: flex;
+}
+
+.modal-box {
+  width: 100%;
+  max-width: 410px;
+  background: var(--paper);
+  border: 3px double var(--gold);
+  border-radius: 16px;
+  padding: 30px 25px;
+  text-align: center;
+  box-shadow: 0 15px 45px rgba(0, 0, 0, 0.25);
+  animation: modalAppear 0.2s ease-out;
+}
+
+@keyframes modalAppear {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-icon {
+  font-size: 2.4rem;
+  margin-bottom: 10px;
+}
+
+.modal-box h2 {
+  font-size: 1.7rem;
+  margin-bottom: 10px;
+}
+
+.modal-box p {
+  color: var(--muted);
+  margin-bottom: 22px;
+}
+
+.modal-ok {
+  min-width: 100px;
+  background: var(--crimson);
+  color: var(--gold-soft);
+  border-color: var(--gold);
+}
+
+.modal-ok:hover {
+  background: var(--crimson-dark);
 }
 
 /* Toast */
@@ -426,7 +596,7 @@ a {
   border-radius: 8px;
   font-weight: 600;
   transition: 0.3s;
-  z-index: 50;
+  z-index: 110;
   max-width: calc(100% - 32px);
   text-align: center;
 }
@@ -443,6 +613,7 @@ a {
   font-size: 0.85rem;
 }
 
+/* Responsive */
 @media (max-width: 960px) {
   .cols {
     grid-template-columns: 1fr;
@@ -454,6 +625,10 @@ a {
 
   .stat {
     padding: 16px 20px;
+  }
+
+  .list {
+    max-height: 55vh;
   }
 }
 
@@ -487,7 +662,13 @@ a {
     flex-direction: column;
   }
 
-  .time {
-    align-self: flex-start;
+  .bk-top-tags {
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .list {
+    max-height: 55vh;
   }
 }

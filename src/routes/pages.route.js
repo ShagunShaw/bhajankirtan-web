@@ -324,7 +324,6 @@ router.get(
   })
 );
 
-Some buttons in the dashboard page are left to be mapped with their respective backedn route like 'markReconfirm', 'reAllot', "Cancel Booking", will continue this later
 router.get("/admin/dashboard/data", async (req, res) => {
   try {
     const base = WEB_ROUTE.replace(/\/+$/, "");

@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -8,6 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <link rel="stylesheet" href="/css/admin-dashboard.css">
   <script src="/js/admin-dashboard.js" defer></script>
 </head>
@@ -59,6 +61,7 @@
           </div>
           <span class="count" id="tomorrowCount">0</span>
         </div>
+
         <div class="list" id="tomorrowList">
           <div class="loading">Loading events...</div>
         </div>
@@ -72,12 +75,32 @@
           </div>
           <span class="count" id="todayCount">0</span>
         </div>
+
         <div class="list" id="todayList">
           <div class="loading">Loading events...</div>
         </div>
       </section>
     </div>
   </main>
+
+  <!-- Package confirmation information popup -->
+  <div class="modal-overlay" id="packageConfirmModal">
+    <div class="modal-box" role="dialog" aria-modal="true"
+      aria-labelledby="packageModalTitle">
+
+      <div class="modal-icon">🙏</div>
+
+      <h2 id="packageModalTitle">Package Booking</h2>
+
+      <p>
+        Please confirm this booking from the Bookings page itself.
+      </p>
+
+      <button type="button" class="btn modal-ok" id="packageConfirmOk">
+        OK
+      </button>
+    </div>
+  </div>
 
   <div id="toast" role="status" aria-live="polite"></div>
 

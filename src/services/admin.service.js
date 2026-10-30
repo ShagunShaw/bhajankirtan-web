@@ -7,7 +7,7 @@ import { istDate } from "../utils/dates.js";
 
 
 const CARD_FIELDS =
-    "referenceId customerName phone eventType eventDate eventTime eventAddress allotments markedReconfirmed";
+    "referenceId customerName phone bookingType packageName eventType eventDate eventTime eventAddress additionalNote status finalAmount allotments markedReconfirmed";
 
 const toCard = (b) => ({
     bookingId: b._id,
@@ -15,9 +15,15 @@ const toCard = (b) => ({
     customerName: b.customerName,
     phone: b.phone,
     eventType: b.eventType,
+    bookingType: b.bookingType,
+    packageName: b.packageName,
+    eventType: b.eventType,
     eventDate: b.eventDate,
     eventTime: b.eventTime,
     eventAddress: b.eventAddress,
+    additionalNote: b.additionalNote,
+    status: b.status,
+    finalAmount: b.finalAmount,
     reconfirmed: b.markedReconfirmed,
     allotments: b.allotments
         .filter((a) => a.status === "assigned")
@@ -29,8 +35,8 @@ const toCard = (b) => ({
         }))
 });
 
-const fetchConfirmedOn = (date) =>
-    Booking.find({ status: "confirmed", eventDate: date })
+const fetchBookings = (date) =>
+    Booking.find({ status: { $nin: ["rejected", "cancelled"] }, eventDate: date })
         .select(CARD_FIELDS)
         .populate("allotments.performer", "fullName")
         .sort({ eventTime: 1 })
@@ -122,16 +128,16 @@ export const dashBoardService = async () => {
         const today = istDate(0);
         const tomorrow = istDate(1);
 
-        const [total, pending, upcomingConfirmed, todayDocs, tomorrowDocs] = await Promise.all([
-            Booking.countDocuments(),
-            Booking.countDocuments({ status: "requested" }),
+        const [totalUpcoming, upcomingPending, upcomingConfirmed, todayDocs, tomorrowDocs] = await Promise.all([
+            Booking.countDocuments({ eventDate: { $gte: today }, status: { $nin: ["rejected", "cancelled"] } }),
+            Booking.countDocuments({ eventDate: { $gte: today }, status: "requested" }),
             Booking.countDocuments({ status: "confirmed", eventDate: { $gte: today } }),
-            fetchConfirmedOn(today),
-            fetchConfirmedOn(tomorrow)
+            fetchBookings(today),
+            fetchBookings(tomorrow)
         ]);
 
         return {
-            counts: { total, pending, upcomingConfirmed },
+            counts: { totalUpcoming, upcomingPending, upcomingConfirmed },
             today: todayDocs.map(toCard),
             tomorrow: tomorrowDocs.map(toCard)
         };
