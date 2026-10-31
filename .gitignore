@@ -141,4 +141,8 @@ dist
 # SvelteKit build / generate output
 .svelte-kit
 
+
+# My files
+chatGPT.prompt.txt
+
 # End of https://www.toptal.com/developers/gitignore/api/node

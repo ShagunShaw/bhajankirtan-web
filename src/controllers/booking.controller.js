@@ -66,7 +66,7 @@ export const confirmBooking = async (req, res) => {
 
 export const rejectBooking = async (req, res) => {
     try {
-        const booking = await rejectBookingService(req.params.bookingId, req.body?.reason);
+        const booking = await rejectBookingService(req.params.bookingId);
         res.status(200).json(new apiResponse(200, booking, "Booking rejected successfully"));
     } catch (error) {
         if (error instanceof apiError) {

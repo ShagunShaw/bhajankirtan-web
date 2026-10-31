@@ -262,13 +262,11 @@ export const confirmBookingService = async (bookingId, body = {}) => {
     }
 };
 
-export const rejectBookingService = async (bookingId, reason) => {
+export const rejectBookingService = async (bookingId) => {
     try {
         assertId(bookingId, "booking ID");
 
         const set = { status: "rejected" };
-        const cleanReason = cleanText(reason);
-        if (cleanReason) set.cancelReason = cleanReason;
 
         const updated = await Booking.findOneAndUpdate(
             { _id: bookingId, status: "requested" },

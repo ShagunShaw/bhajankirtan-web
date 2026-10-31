@@ -41,7 +41,7 @@ Ans) One request per page load fetches every visible performer (admin gets every
 
 • Since the data in the booking table can grow over time, and once the event is completed, you dont need that data anymore, so its better to delete it timely from the db, so that our client do not have to pay in future for those unnecessary datas. So once ask the client about it, at what interval, they want their data to get cleaned: daily, weekly or monthly. Well we had setup the cron job for this, with RETENTION_DAYS= 45, we can edit this 'RETENTION_DAYS' also, after asking the client that after how many days he wants to clear his booking history.
 
-• Frontend pe we are only handling the case for if everything goes right, but if anything goes not then we need to dispaly a proper mssg with a proper UI for it, so do that also, once all the pages has been done
+• Frontend pe we are only handling the case for if everything goes right, but if anything goes not then we need to dispaly a proper mssg with a proper UI for it, so do that also, once all the pages has been done. Update: okk so from the buttons part in /admin/dashboard route in frontedn, we are handling the errors also there. So after that, all frontedn routes have their errors handled in them. Only jsut we have to revise the routes before that (i.e. load the content of admin dashboard route and all public routes) to handle our errors in those routes/cases/buttons. Rest are all handled.
 
 • check on frontend price lsiting part, ki kisi performer k peakPice k time pe hamara website uss performer ka basePrice na show krra ho, and from backend we are sending the response correctly do dw about it
 
@@ -49,4 +49,4 @@ Ans) One request per page load fetches every visible performer (admin gets every
 
 • Cookie security: You're using httpOnly, secure in production, and sameSite. Good. We should also verify HTTPS is enforced in production and assess CSRF protection for state-changing requests.
 
-• Use `upload.fields([{ name: "avatar", maxCount: 1 }, { name: "docs", maxCount: 5 }])` for multiple file fields (or `upload.array("images", 5)` for one field with many files); text fields land in `req.body` and files in `req.files`. And if nothing is there, then use upload.none()
+• Client ko ek baar alg se bta dena, ki for a 'solo' booking, agr koi performer ....
