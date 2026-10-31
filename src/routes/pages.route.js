@@ -352,6 +352,85 @@ router.get("/admin/dashboard/data", async (req, res) => {
     });
   }
 });
+
+// Forward admin actions to the backend API.
+// WEB_ROUTE already includes /api in your current configuration.
+const forwardAdminApi = async (req, res, backendPath) => {
+  try {
+    const base = WEB_ROUTE.replace(/\/+$/, "");
+
+    const response = await fetch(`${base}${backendPath}`, {
+      method: req.method,
+      headers: {
+        Cookie: req.headers.cookie || "",
+        Accept: "application/json",
+        ...(req.method !== "GET" && req.method !== "HEAD"
+          ? { "Content-Type": "application/json" }
+          : {}),
+      },
+      ...(req.method !== "GET" && req.method !== "HEAD"
+        ? { body: JSON.stringify(req.body || {}) }
+        : {}),
+    });
+
+    const setCookies = response.headers.getSetCookie?.() || [];
+    for (const cookie of setCookies) {
+      res.append("Set-Cookie", cookie);
+    }
+
+    const result = await response.json();
+    return res.status(response.status).json(result);
+  } catch (error) {
+    console.error("Admin API forwarding failed:", error.message);
+
+    return res.status(502).json({
+      success: false,
+      errMessage: "Unable to connect to the server. Please try again.",
+    });
+  }
+};
+
+// Fetch performers for confirmation and reallotment.
+router.get("/admin/actions/performers", (req, res) =>
+  forwardAdminApi(req, res, "/performer/")
+);
+
+// Confirm booking.
+router.post("/admin/actions/confirm/:bookingId", (req, res) =>
+  forwardAdminApi(
+    req,
+    res,
+    `/booking/confirm/${encodeURIComponent(req.params.bookingId)}`
+  )
+);
+
+// Reject booking.
+router.post("/admin/actions/reject/:bookingId", (req, res) =>
+  forwardAdminApi(
+    req,
+    res,
+    `/booking/reject/${encodeURIComponent(req.params.bookingId)}`
+  )
+);
+
+// Cancel booking.
+router.post("/admin/actions/cancel/:bookingId", (req, res) =>
+  forwardAdminApi(
+    req,
+    res,
+    `/booking/cancel/${encodeURIComponent(req.params.bookingId)}`
+  )
+);
+
+// Reallot performer.
+router.post("/admin/actions/reallot/:bookingId", (req, res) =>
+  forwardAdminApi(
+    req,
+    res,
+    `/booking/reallot/${encodeURIComponent(req.params.bookingId)}`
+  )
+);
+
 router.get("/admin/bookings", page("admin/bookings", "Bookings", { active: "bookings" }));
 router.get("/admin/performers", page("admin/performers", "Performers", { active: "performers" }));
 router.get("/admin/performers/new", page("admin/performer-new", "Add Performer", { active: "performers" }));

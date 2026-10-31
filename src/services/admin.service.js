@@ -7,7 +7,7 @@ import { istDate } from "../utils/dates.js";
 
 
 const CARD_FIELDS =
-    "referenceId customerName phone bookingType packageName eventType eventDate eventTime eventAddress additionalNote status finalAmount allotments markedReconfirmed";
+    "referenceId customerName phone bookingType requestedPerformer packageName eventType eventDate eventTime eventAddress additionalNote status finalAmount allotments markedReconfirmed";
 
 const toCard = (b) => ({
     bookingId: b._id,
@@ -17,7 +17,12 @@ const toCard = (b) => ({
     eventType: b.eventType,
     bookingType: b.bookingType,
     packageName: b.packageName,
-    eventType: b.eventType,
+    requestedPerformer: b.requestedPerformer
+        ? {
+            id: b.requestedPerformer._id,
+            fullName: b.requestedPerformer.fullName,
+        }
+        : null,
     eventDate: b.eventDate,
     eventTime: b.eventTime,
     eventAddress: b.eventAddress,
@@ -39,6 +44,7 @@ const fetchBookings = (date) =>
     Booking.find({ status: { $nin: ["rejected", "cancelled"] }, eventDate: date })
         .select(CARD_FIELDS)
         .populate("allotments.performer", "fullName")
+        .populate("requestedPerformer", "fullName")
         .sort({ eventTime: 1 })
         .lean();
 

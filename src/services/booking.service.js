@@ -92,7 +92,7 @@ const assertNoConflicts = async (performerIds, eventDate, excludeBookingId, igno
     const text = conflicts
         .map((c) => `${nameOf.get(c.performerId) || "A performer"} is already booked for ${c.referenceId} at ${c.eventTime}`)
         .join("; ");
-    throw new apiError(409, "Booking Conflict", `${text} on ${eventDate}. Send ignoreConflicts: true to allot anyway.`);
+    throw new apiError(409, "Booking Conflict", `${text} on ${eventDate}. Allot any other performer for this event OR Tick the "Ignore Conflicts" checkbox to allot this performer anyway.`);
 };
 
 const toAdminBooking = (b) => ({
