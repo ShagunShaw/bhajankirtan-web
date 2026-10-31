@@ -1,4 +1,4 @@
-import { updateFinalAmount, getAllBookingsService, confirmBookingService, rejectBookingService, reAllotBookingService, cancelBookingService } from "../services/booking.service.js";
+import { updateFinalAmount, getAllBookingsService, confirmBookingService, rejectBookingService, reAllotBookingService, cancelBookingService, searchBookingsService } from "../services/booking.service.js";
 import { apiResponse } from "../utils/apiResponse.js";
 import { apiError } from "../utils/apiError.js";
 
@@ -123,7 +123,7 @@ export const cancelBooking = async (req, res) => {
 
 export const searchBookings = async (req, res) => {
     try {
-        const result = await bookingService.searchBookingsService(req.query);
+        const result = await searchBookingsService(req.query);
 
         return res.status(200).json(
             new apiResponse(200, result.data, result.message)

@@ -10,7 +10,7 @@ const router = express.Router();
 /**
  * Param	  Default	     Notes
    status	  all	         one of requested, confirmed, rejected, cancelled, completed
-   page	1	  page         number
+   page	    1	           page number
    limit	  50	         maximum 100
  */
 router.get("/", verifyJWT, bookingController.getAllBookings)    // Checked

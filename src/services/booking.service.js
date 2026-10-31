@@ -409,7 +409,7 @@ export const searchBookingsService = async (query = {}) => {
         }
         // 2. Status filter
         if (status && typeof status === "string") {
-            const validStatuses = ["requested", "confirmed", "completed", "cancelled"];
+            const validStatuses = ["requested", "confirmed", "rejected", "cancelled"];
             if (!validStatuses.includes(status)) {
                 throw new apiError(400, "Validation Error", `Invalid status. Must be one of: ${validStatuses.join(", ")}`);
             }
