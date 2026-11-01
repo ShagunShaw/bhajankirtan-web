@@ -391,22 +391,27 @@ export const searchBookingsService = async (query = {}) => {
         const limit = Math.min(100, Math.max(1, parseInt(query.limit, 10) || 20));
         const skip = (page - 1) * limit;
         const filter = {};
-        // 1. Date range filter
+
+        // 1. Date range filter (eventDate is stored as a "YYYY-MM-DD" string)
+        const isValidDateStr = (s) =>
+            /^\d{4}-\d{2}-\d{2}$/.test(s) && !isNaN(new Date(`${s}T00:00:00Z`).getTime());
+
         if (fromDate || toDate) {
             filter.eventDate = {};
             if (fromDate) {
-                const start = new Date(fromDate);
-                if (isNaN(start.getTime())) throw new apiError(400, "Validation Error", "Invalid fromDate format");
-                start.setHours(0, 0, 0, 0);
-                filter.eventDate.$gte = start;
+                if (!isValidDateStr(fromDate)) {
+                    throw new apiError(400, "Validation Error", "Invalid fromDate format (expected YYYY-MM-DD)");
+                }
+                filter.eventDate.$gte = fromDate;
             }
             if (toDate) {
-                const end = new Date(toDate);
-                if (isNaN(end.getTime())) throw new apiError(400, "Validation Error", "Invalid toDate format");
-                end.setHours(23, 59, 59, 999);
-                filter.eventDate.$lte = end;
+                if (!isValidDateStr(toDate)) {
+                    throw new apiError(400, "Validation Error", "Invalid toDate format (expected YYYY-MM-DD)");
+                }
+                filter.eventDate.$lte = toDate;
             }
         }
+
         // 2. Status filter
         if (status && typeof status === "string") {
             const validStatuses = ["requested", "confirmed", "rejected", "cancelled", "completed"];
@@ -433,16 +438,19 @@ export const searchBookingsService = async (query = {}) => {
             filter.package = packageId;
         }
         // Execute query & count in parallel
-        const [bookings, total] = await Promise.all([
+        const [rows, total] = await Promise.all([
             Booking.find(filter)
-                .populate("requestedPerformer", "fullName profilePhoto")
-                .populate("package", "packageName")
                 .sort({ eventDate: -1 })
                 .skip(skip)
                 .limit(limit)
                 .lean(),
             Booking.countDocuments(filter)
         ]);
+
+        // Same populate + mapping as getAllBookingsService, so the frontend gets the same shape
+        const populated = await Booking.populate(rows, POPULATE);
+        const bookings = populated.map(toAdminBooking);
+
         // If results exist, return normally
         if (bookings.length > 0) {
             return {
@@ -458,8 +466,9 @@ export const searchBookingsService = async (query = {}) => {
         const cleanupLog = await Log.findOne({ key: "booking_cleanup" }).lean();
         const cutoffDate = cleanupLog?.lastCleanedUpBeforeDate;
         // Determine if the search window falls prior to the cleanup cutoff date
-        const queriedDate = toDate ? new Date(toDate) : (fromDate ? new Date(fromDate) : null);
-        if (cutoffDate && queriedDate && queriedDate < cutoffDate) {
+        const queriedStr = toDate || fromDate;
+        const queriedDate = queriedStr ? new Date(`${queriedStr}T00:00:00Z`) : null;
+         if (cutoffDate && queriedDate && queriedDate < cutoffDate) {
             const formattedDate = cutoffDate.toISOString().split("T")[0];
             return {
                 data: {

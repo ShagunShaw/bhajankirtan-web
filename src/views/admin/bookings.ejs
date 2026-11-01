@@ -1,154 +1,161 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= title %> | BhajanKirtan</title>
+  <title>
+    <%= title %> | BhajanKirtan
+  </title>
 
   <link rel="stylesheet" href="/css/admin-dashboard.css">
   <link rel="stylesheet" href="/css/admin-bookings.css">
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700;800&family=Rozha+One&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Mukta:wght@400;500;600;700;800&family=Rozha+One&display=swap"
+    rel="stylesheet">
 </head>
 
 <body>
   <%- include("../partials/admin-header", { active: "bookings" }) %>
 
-  <main class="admin-wrap bookings-page">
+    <main class="admin-wrap bookings-page">
 
-    <div class="page-head">
-      <div>
-        <h1>Bookings</h1>
-        <p>Manage all performer and package bookings</p>
-      </div>
-      <div class="booking-total">
-        <span id="totalBookings">—</span>
-        <small>Total bookings</small>
-      </div>
-    </div>
-
-    <!-- Filters -->
-    <section class="booking-filters">
-      <div class="filter-heading">
+      <div class="page-head">
         <div>
-          <h2>Find Bookings</h2>
-          <p>Filter bookings using the options below</p>
+          <h1>Bookings</h1>
+          <p>Manage all performer and package bookings</p>
         </div>
-        <button type="button" id="resetFilters" class="reset-filter">
-          Reset filters
-        </button>
+        <div class="booking-total">
+          <span id="totalBookings">—</span>
+          <small>Total bookings</small>
+        </div>
       </div>
 
-      <div class="filter-grid">
-        <div class="filter-field">
-          <label for="fromDate">Event date from</label>
-          <input type="date" id="fromDate">
-        </div>
-
-        <div class="filter-field">
-          <label for="toDate">Event date to</label>
-          <input type="date" id="toDate">
-        </div>
-
-        <div class="filter-field">
-          <label for="filterStatus">Booking status</label>
-          <select id="filterStatus">
-            <option value="">All statuses</option>
-            <option value="requested">Pending</option>
-            <option value="confirmed">Confirmed</option>
-            <option value="rejected">Rejected</option>
-            <option value="cancelled">Cancelled</option>
-            <option value="completed">Completed</option>
-          </select>
-        </div>
-
-        <div class="filter-field">
-          <label for="filterPerformer">Performer</label>
-          <select id="filterPerformer">
-            <option value="">All performers</option>
-          </select>
-        </div>
-
-        <div class="filter-field">
-          <label for="filterPackage">Package ID</label>
-          <input type="text" id="filterPackage" placeholder="Enter package ID">
-        </div>
-
-        <div class="filter-field filter-submit">
-          <label>&nbsp;</label>
-          <button type="button" id="applyFilters" class="btn btn-confirm">
-            <span>Search Bookings</span>
+      <!-- Filters -->
+      <section class="booking-filters">
+        <div class="filter-heading">
+          <div>
+            <h2>Find Bookings</h2>
+            <p>Filter bookings using the options below</p>
+          </div>
+          <button type="button" id="resetFilters" class="reset-filter">
+            Reset filters
           </button>
         </div>
-      </div>
-    </section>
 
-    <!-- Cleanup information -->
-    <div id="cleanupNotice" class="cleanup-notice" hidden></div>
+        <div class="filter-grid">
+          <div class="filter-field">
+            <label for="fromDate">Event date from</label>
+            <input type="date" id="fromDate">
+          </div>
 
-    <!-- Table -->
-    <section class="bookings-table-panel">
-      <div class="table-heading">
-        <div>
-          <h2>Booking Records</h2>
-          <p id="resultSummary">Loading bookings...</p>
+          <div class="filter-field">
+            <label for="toDate">Event date to</label>
+            <input type="date" id="toDate">
+          </div>
+
+          <div class="filter-field">
+            <label for="filterStatus">Booking status</label>
+            <select id="filterStatus">
+              <option value="">All statuses</option>
+              <option value="requested">Pending</option>
+              <option value="confirmed">Confirmed</option>
+              <option value="rejected">Rejected</option>
+              <option value="cancelled">Cancelled</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+
+          <div class="filter-field">
+            <label for="filterPerformer">Performer</label>
+            <select id="filterPerformer">
+              <option value="">All performers</option>
+            </select>
+          </div>
+
+          <div class="filter-field">
+            <label for="filterPackage">Package</label>
+            <select id="filterPackage">
+              <option value="">All packages</option>
+            </select>
+          </div>
+
+          <div class="filter-field filter-submit">
+            <label>&nbsp;</label>
+            <button type="button" id="applyFilters" class="btn btn-confirm">
+              <span>Search Bookings</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Cleanup information -->
+      <div id="cleanupNotice" class="cleanup-notice" hidden></div>
+
+      <!-- Table -->
+      <section class="bookings-table-panel">
+        <div class="table-heading">
+          <div>
+            <h2>Booking Records</h2>
+            <p id="resultSummary">Loading bookings...</p>
+          </div>
+
+          <button type="button" id="refreshBookings" class="refresh-btn">
+            ↻ Refresh
+          </button>
         </div>
 
-        <button type="button" id="refreshBookings" class="refresh-btn">
-          ↻ Refresh
-        </button>
-      </div>
+        <div id="tableLoading" class="table-state">
+          <span class="loader"></span>
+          Loading bookings...
+        </div>
 
-      <div id="tableLoading" class="table-state">
-        <span class="loader"></span>
-        Loading bookings...
-      </div>
+        <div id="tableError" class="table-state error-state" hidden></div>
 
-      <div id="tableError" class="table-state error-state" hidden></div>
+        <div class="table-scroll" id="tableContainer" hidden>
+          <table class="bookings-table">
+            <thead>
+              <tr>
+                <th>Booking</th>
+                <th>Customer</th>
+                <th>Event</th>
+                <th>Event date</th>
+                <th>Type / Details</th>
+                <th>Amount</th>
+                <th>Status</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="bookingsBody"></tbody>
+          </table>
+        </div>
 
-      <div class="table-scroll" id="tableContainer" hidden>
-        <table class="bookings-table">
-          <thead>
-            <tr>
-              <th>Booking</th>
-              <th>Customer</th>
-              <th>Event</th>
-              <th>Event date</th>
-              <th>Type / Details</th>
-              <th>Amount</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody id="bookingsBody"></tbody>
-        </table>
-      </div>
+        <div id="emptyBookings" class="table-state empty" hidden>
+          <span>🙏</span>
+          <strong>No bookings found</strong>
+          <p>Try changing your filters or search criteria.</p>
+        </div>
 
-      <div id="emptyBookings" class="table-state empty" hidden>
-        <span>🙏</span>
-        <strong>No bookings found</strong>
-        <p>Try changing your filters or search criteria.</p>
-      </div>
+        <!-- Pagination -->
+        <div class="pagination" id="pagination" hidden>
+          <button id="prevPage" type="button">← Previous</button>
+          <span id="pageInfo">Page 1</span>
+          <button id="nextPage" type="button">Next →</button>
+        </div>
+      </section>
+    </main>
 
-      <!-- Pagination -->
-      <div class="pagination" id="pagination" hidden>
-        <button id="prevPage" type="button">← Previous</button>
-        <span id="pageInfo">Page 1</span>
-        <button id="nextPage" type="button">Next →</button>
-      </div>
-    </section>
-  </main>
+    <!-- Shared admin modal -->
+    <%- include("../partials/admin-action-modal") %>
 
-  <!-- Shared admin modal -->
-  <%- include("../partials/admin-action-modal") %>
+      <div id="toast"></div>
 
-  <div id="toast"></div>
+      <%- include("../partials/admin-footer") %>
 
-  <%- include("../partials/admin-footer") %>
-
-  <script src="/js/admin-header.js"></script>
-  <script src="/js/admin-bookings.js"></script>
+        <script src="/js/admin-header.js"></script>
+        <script src="/js/admin-bookings.js"></script>
 </body>
+
 </html>

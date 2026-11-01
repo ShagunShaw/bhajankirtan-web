@@ -1,6 +1,8 @@
 (() => {
   const $ = (id) => document.getElementById(id);
 
+  const PACKAGES_URL = "/api/package/";
+
   const state = {
     bookings: [],
     page: 1,
@@ -9,6 +11,7 @@
     totalPages: 1,
     searchMode: false,
     performers: null,
+    packages: null,
     activeBooking: null,
     currentAction: null,
   };
@@ -37,10 +40,10 @@
     return Number.isNaN(parsed.getTime())
       ? escapeHTML(date)
       : parsed.toLocaleDateString("en-IN", {
-          day: "numeric",
-          month: "short",
-          year: "numeric",
-        });
+        day: "numeric",
+        month: "short",
+        year: "numeric",
+      });
   };
 
   const showToast = (message) => {
@@ -123,6 +126,34 @@
         · ${escapeHTML((p.tags || []).join(", "))}
       </option>
     `).join("");
+  };
+
+  // -------------------- Packages (filter) --------------------
+
+  const getPackages = async () => {
+    if (state.packages) return state.packages;
+
+    const result = await apiRequest(PACKAGES_URL);
+    const list = result.data?.packages || result.data || [];
+
+    state.packages = Array.isArray(list) ? list : [];
+    return state.packages;
+  };
+
+  const loadPackageFilter = async () => {
+    try {
+      const packages = await getPackages();
+
+      $("filterPackage").innerHTML =
+        `<option value="">All packages</option>` +
+        packages.map((p) => `
+          <option value="${escapeHTML(p._id || p.id)}">
+            ${escapeHTML(p.packageName)}
+          </option>
+        `).join("");
+    } catch (error) {
+      console.error("Could not load package filters:", error);
+    }
   };
 
   // -------------------- Table rendering --------------------
@@ -262,7 +293,7 @@
       const toDate = $("toDate").value;
       const status = $("filterStatus").value;
       const performerId = $("filterPerformer").value;
-      const packageId = $("filterPackage").value.trim();
+      const packageId = $("filterPackage").value;
 
       if (fromDate) params.set("fromDate", fromDate);
       if (toDate) params.set("toDate", toDate);
@@ -552,31 +583,31 @@
   // -------------------- Reallot --------------------
 
   const openReallot = async (booking) => {
-  state.activeBooking = booking;
-  state.currentAction = "reallot";
+    state.activeBooking = booking;
+    state.currentAction = "reallot";
 
-  const closeBtn = `<button type="button" class="btn" data-modal-action="close">Close</button>`;
+    const closeBtn = `<button type="button" class="btn" data-modal-action="close">Close</button>`;
 
-  showModal("Reallot Performers", `<p>Loading performers...</p>`, closeBtn, "🙏");
+    showModal("Reallot Performers", `<p>Loading performers...</p>`, closeBtn, "🙏");
 
-  try {
-    await getPerformers();
+    try {
+      await getPerformers();
 
-    const allotments = (booking.allotments || []).filter(
-      (a) => a.status === "assigned"
-    );
-
-    if (!allotments.length) {
-      showModal(
-        "Reallot Performers",
-        `<p>This booking has no existing allotments to reassign.</p>`,
-        closeBtn,
-        "⚠️"
+      const allotments = (booking.allotments || []).filter(
+        (a) => a.status === "assigned"
       );
-      return;
-    }
 
-    const rows = allotments.map((allotment) => `
+      if (!allotments.length) {
+        showModal(
+          "Reallot Performers",
+          `<p>This booking has no existing allotments to reassign.</p>`,
+          closeBtn,
+          "⚠️"
+        );
+        return;
+      }
+
+      const rows = allotments.map((allotment) => `
       <div class="reallot-row" data-old-id="${escapeHTML(allotment.allotmentId || "")}">
         <div class="reallot-old">
           <b>Current performer</b>
@@ -608,60 +639,60 @@
       </div>
     `).join("");
 
-    showModal(
-      "Reallot Performers",
-      `
+      showModal(
+        "Reallot Performers",
+        `
         <div class="reallot-list">${rows}</div>
         <p class="field-help">Click "All done" after completing the required reallotments.</p>
       `,
-      `${closeBtn}
+        `${closeBtn}
        <button type="button" class="btn btn-confirm" data-modal-action="reload">All done</button>`,
-      "🙏"
-    );
+        "🙏"
+      );
 
-    modalBody.querySelectorAll(".reallot-row").forEach((row) => {
-      const button = row.querySelector(".btn-reallot-row");
+      modalBody.querySelectorAll(".reallot-row").forEach((row) => {
+        const button = row.querySelector(".btn-reallot-row");
 
-      button.addEventListener("click", async () => {
-        const oldAllotmentId = row.dataset.oldId;
-        const newPerformerId = row.querySelector(".reallot-performer").value;
-        const ignoreConflicts = row.querySelector(".reallot-ignore").checked;
+        button.addEventListener("click", async () => {
+          const oldAllotmentId = row.dataset.oldId;
+          const newPerformerId = row.querySelector(".reallot-performer").value;
+          const ignoreConflicts = row.querySelector(".reallot-ignore").checked;
 
-        if (!oldAllotmentId || !newPerformerId) {
-          showToast("Select a new performer first.");
-          return;
-        }
+          if (!oldAllotmentId || !newPerformerId) {
+            showToast("Select a new performer first.");
+            return;
+          }
 
-        const body = { oldAllotmentId, newPerformerId };
-        if (ignoreConflicts) body.ignoreConflicts = true;
+          const body = { oldAllotmentId, newPerformerId };
+          if (ignoreConflicts) body.ignoreConflicts = true;
 
-        button.disabled = true;
-        button.textContent = "Saving...";
+          button.disabled = true;
+          button.textContent = "Saving...";
 
-        try {
-          const result = await apiRequest(
-            `/admin/actions/reallot/${encodeURIComponent(booking.bookingId)}`,
-            { method: "POST", body: JSON.stringify(body) }
-          );
+          try {
+            const result = await apiRequest(
+              `/admin/actions/reallot/${encodeURIComponent(booking.bookingId)}`,
+              { method: "POST", body: JSON.stringify(body) }
+            );
 
-          button.outerHTML = `<span class="tag-ok">✔ Reallotted</span>`;
-          showToast(result.message || "Performer reallotted successfully.");
-        } catch (error) {
-          button.disabled = false;
-          button.textContent = "Reallot";
-          showToast(error.message || "Reallotment failed.");
-        }
+            button.outerHTML = `<span class="tag-ok">✔ Reallotted</span>`;
+            showToast(result.message || "Performer reallotted successfully.");
+          } catch (error) {
+            button.disabled = false;
+            button.textContent = "Reallot";
+            showToast(error.message || "Reallotment failed.");
+          }
+        });
       });
-    });
-  } catch (error) {
-    showModal(
-      "Unable to Load Performers",
-      `<div class="modal-message">${escapeHTML(error.message)}</div>`,
-      closeBtn,
-      "⚠️"
-    );
-  }
-};
+    } catch (error) {
+      showModal(
+        "Unable to Load Performers",
+        `<div class="modal-message">${escapeHTML(error.message)}</div>`,
+        closeBtn,
+        "⚠️"
+      );
+    }
+  };
 
   document.addEventListener("click", (event) => {
     const button = event.target.closest("[data-act]");
@@ -714,7 +745,7 @@
 
   $("applyFilters").addEventListener("click", () => {
     if ($("fromDate").value && $("toDate").value &&
-        $("fromDate").value > $("toDate").value) {
+      $("fromDate").value > $("toDate").value) {
       showToast("From date cannot be later than To date.");
       return;
     }
@@ -762,5 +793,6 @@
 
   // Initial page load: fetch all bookings, not the search endpoint.
   loadPerformerFilter();
+  loadPackageFilter();
   fetchBookings(false, 1);
 })();
