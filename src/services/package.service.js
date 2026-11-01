@@ -50,7 +50,8 @@ export const getAllPackagesService = async (query = {}) => {
 
         const packages = await Package.find(filter)
             .sort({ price: 1 })
-            .lean();
+            .lean()
+            .select("-workPhotos -workVideos -createdAt -updatedAt");
 
         return packages;
     } catch (error) {

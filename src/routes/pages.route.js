@@ -485,6 +485,29 @@ router.get("/admin/bookings/search", async (req, res) => {
   }
 });
 
+// Performer detail page (HTML only)
+router.get("/admin/performer/:performerId", (req, res) =>
+  res.render("admin/performer-detail", {
+    title: "Performer | BhajanKirtan",
+    active: "performers",
+    performerId: req.params.performerId,
+  })
+);
+
+// Single performer data -> GET WEB_ROUTE/performer/:performerId
+router.get("/admin/actions/performer/:performerId", (req, res) =>
+  forwardAdminApi(req, res, `/performer/${encodeURIComponent(req.params.performerId)}`)
+);
+
+// Visibility toggle -> PATCH WEB_ROUTE/performer/visibility/:performerId
+router.patch("/admin/actions/performer/visibility/:performerId", (req, res) =>
+  forwardAdminApi(
+    req,
+    res,
+    `/performer/visibility/${encodeURIComponent(req.params.performerId)}`
+  )
+);
+
 router.get("/admin/performers", page("admin/performers", "Performers", { active: "performers" }));
 router.get("/admin/performers/new", page("admin/performer-new", "Add Performer", { active: "performers" }));
 router.get("/admin/performers/:id/edit", page("admin/performer-edit", "Edit Performer", { active: "performers" }));
