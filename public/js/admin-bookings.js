@@ -552,114 +552,116 @@
   // -------------------- Reallot --------------------
 
   const openReallot = async (booking) => {
-    state.activeBooking = booking;
+  state.activeBooking = booking;
+  state.currentAction = "reallot";
 
-    try {
-      await getPerformers();
+  const closeBtn = `<button type="button" class="btn" data-modal-action="close">Close</button>`;
 
-      const activeAllotments = (booking.allotments || [])
-        .filter((a) => a.status === "assigned");
+  showModal("Reallot Performers", `<p>Loading performers...</p>`, closeBtn, "🙏");
 
-      if (!activeAllotments.length) {
-        showModal(
-          "No Active Allotments",
-          "There are no currently assigned performers to reallot.",
-          `<button type="button" class="btn btn-confirm" data-modal-action="close">OKK</button>`,
-          "🙏"
-        );
-        return;
-      }
+  try {
+    await getPerformers();
 
-      const rows = activeAllotments.map((a, index) => `
-        <div class="reallot-row">
-          <div>
-            <strong>${escapeHTML(a.performerName)}</strong>
-            <small class="booking-sub">${escapeHTML(a.role || "Assigned performer")}</small>
-          </div>
+    const allotments = (booking.allotments || []).filter(
+      (a) => a.status === "assigned"
+    );
 
-          <select class="reallot-new-performer" data-allotment="${escapeHTML(a.allotmentId)}">
-            <option value="">Select replacement</option>
-            ${performerOptions()}
-          </select>
-
-          <label class="modal-check">
-            <input type="checkbox" class="reallot-ignore" data-index="${index}">
-            Ignore conflicts
-          </label>
-        </div>
-      `).join("");
-
+    if (!allotments.length) {
       showModal(
         "Reallot Performers",
-        `
-          <p>Choose replacement performers for this booking.</p>
-          <div class="reallot-list">${rows}</div>
-        `,
-        `<button type="button" class="btn" data-modal-action="close">Close</button>
-         <button type="button" class="btn btn-confirm" data-modal-action="reallot-submit">Save Reallotment</button>`,
-        "🙏"
-      );
-    } catch (error) {
-      showModal(
-        "Unable to load performers",
-        escapeHTML(error.message),
-        `<button type="button" class="btn btn-confirm" data-modal-action="close">OKK</button>`,
+        `<p>This booking has no existing allotments to reassign.</p>`,
+        closeBtn,
         "⚠️"
       );
-    }
-  };
-
-  const submitReallot = async () => {
-    const booking = state.activeBooking;
-    if (!booking) return;
-
-    const selects = [...document.querySelectorAll(".reallot-new-performer")];
-    const checkboxes = [...document.querySelectorAll(".reallot-ignore")];
-
-    const requests = selects.map((select, index) => ({
-      oldAllotmentId: select.dataset.allotment,
-      newPerformerId: select.value,
-      ignoreConflicts: checkboxes[index]?.checked === true,
-    }));
-
-    if (requests.some((r) => !r.newPerformerId)) {
-      showToast("Please select a replacement performer for each allotment.");
       return;
     }
 
-    closeModal();
+    const rows = allotments.map((allotment) => `
+      <div class="reallot-row" data-old-id="${escapeHTML(allotment.allotmentId || "")}">
+        <div class="reallot-old">
+          <b>Current performer</b>
+          <span>${escapeHTML(allotment.performerName || "Unknown performer")}</span>
+        </div>
 
-    // Existing backend action accepts one allotment replacement per request.
-    try {
-      for (const request of requests) {
-        const body = {
-          oldAllotmentId: request.oldAllotmentId,
-          newPerformerId: request.newPerformerId,
-        };
+        <div>
+          <label>New performer</label>
+          <select class="reallot-performer">
+            <option value="">Select performer</option>
+            ${performerOptions()}
+          </select>
+        </div>
 
-        if (request.ignoreConflicts) body.ignoreConflicts = true;
+        <div>
+          <label class="modal-check">
+            <input type="checkbox" class="reallot-ignore">
+            Ignore Conflicts
+          </label>
+          <p class="field-help">
+            If turned on, existing bookings for the new performer on the
+            same day will not block this reallotment.
+          </p>
+        </div>
 
-        await apiRequest(
-          `/admin/actions/reallot/${encodeURIComponent(booking.bookingId)}`,
-          {
-            method: "POST",
-            body: JSON.stringify(body),
-          }
-        );
-      }
+        <div class="reallot-row-action">
+          <button type="button" class="btn btn-reallot-row">Reallot</button>
+        </div>
+      </div>
+    `).join("");
 
-      showSuccess("Performer allotments updated successfully.");
-    } catch (error) {
-      showModal(
-        "Reallotment Failed",
-        escapeHTML(error.message),
-        `<button type="button" class="btn btn-confirm" data-modal-action="close">OKK</button>`,
-        "⚠️"
-      );
-    }
-  };
+    showModal(
+      "Reallot Performers",
+      `
+        <div class="reallot-list">${rows}</div>
+        <p class="field-help">Click "All done" after completing the required reallotments.</p>
+      `,
+      `${closeBtn}
+       <button type="button" class="btn btn-confirm" data-modal-action="reload">All done</button>`,
+      "🙏"
+    );
 
-  // -------------------- Event listeners --------------------
+    modalBody.querySelectorAll(".reallot-row").forEach((row) => {
+      const button = row.querySelector(".btn-reallot-row");
+
+      button.addEventListener("click", async () => {
+        const oldAllotmentId = row.dataset.oldId;
+        const newPerformerId = row.querySelector(".reallot-performer").value;
+        const ignoreConflicts = row.querySelector(".reallot-ignore").checked;
+
+        if (!oldAllotmentId || !newPerformerId) {
+          showToast("Select a new performer first.");
+          return;
+        }
+
+        const body = { oldAllotmentId, newPerformerId };
+        if (ignoreConflicts) body.ignoreConflicts = true;
+
+        button.disabled = true;
+        button.textContent = "Saving...";
+
+        try {
+          const result = await apiRequest(
+            `/admin/actions/reallot/${encodeURIComponent(booking.bookingId)}`,
+            { method: "POST", body: JSON.stringify(body) }
+          );
+
+          button.outerHTML = `<span class="tag-ok">✔ Reallotted</span>`;
+          showToast(result.message || "Performer reallotted successfully.");
+        } catch (error) {
+          button.disabled = false;
+          button.textContent = "Reallot";
+          showToast(error.message || "Reallotment failed.");
+        }
+      });
+    });
+  } catch (error) {
+    showModal(
+      "Unable to Load Performers",
+      `<div class="modal-message">${escapeHTML(error.message)}</div>`,
+      closeBtn,
+      "⚠️"
+    );
+  }
+};
 
   document.addEventListener("click", (event) => {
     const button = event.target.closest("[data-act]");
@@ -698,9 +700,6 @@
         break;
       case "cancel-submit":
         submitCancel();
-        break;
-      case "reallot-submit":
-        submitReallot();
         break;
     }
   });
