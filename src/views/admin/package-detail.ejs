@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %></title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/css/admin-dashboard.css">
+  <link rel="stylesheet" href="/css/admin-performers.css">
+  <link rel="stylesheet" href="/css/admin-packages.css">
+</head>
+<body>
+
+  <%- include("../partials/admin-header") %>
+
+  <main class="pf-page" id="pkRoot" data-package-id="<%= packageId %>">
+    <div class="admin-wrap">
+      <a href="/admin/package" class="pf-back">← Back to packages</a>
+
+      <div class="pf-state" id="pkLoading">Loading package...</div>
+      <div class="pf-state pf-error" id="pkError" hidden></div>
+
+      <div id="pkContent" hidden></div>
+    </div>
+
+    <button type="button" class="pf-fab" id="editPackageBtn">✎ Edit Package</button>
+    <div class="pf-toast" id="pfToast" role="status" aria-live="polite"></div>
+  </main>
+
+  <%- include("../partials/admin-footer") %>
+
+  <script src="/js/admin-package-detail.js"></script>
+</body>
+</html>

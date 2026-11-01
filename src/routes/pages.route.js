@@ -508,10 +508,44 @@ router.patch("/admin/actions/performer/visibility/:performerId", (req, res) =>
   )
 );
 
+// ---- Package data (forwarded to backend with the admin cookie) ----
+// All packages -> GET WEB_ROUTE/package/
+router.get("/admin/actions/packages", (req, res) =>
+  forwardAdminApi(req, res, "/package/")
+);
+
+// Single package -> GET WEB_ROUTE/package/:packageId
+router.get("/admin/actions/package/:packageId", (req, res) =>
+  forwardAdminApi(req, res, `/package/${encodeURIComponent(req.params.packageId)}`)
+);
+
+// Visibility toggle -> PATCH WEB_ROUTE/package/visibility/:packageId
+router.patch("/admin/actions/package/visibility/:packageId", (req, res) =>
+  forwardAdminApi(
+    req,
+    res,
+    `/package/visibility/${encodeURIComponent(req.params.packageId)}`
+  )
+);
+
 router.get("/admin/performers", page("admin/performers", "Performers", { active: "performers" }));
 router.get("/admin/performers/new", page("admin/performer-new", "Add Performer", { active: "performers" }));
 router.get("/admin/performers/:id/edit", page("admin/performer-edit", "Edit Performer", { active: "performers" }));
-router.get("/admin/packages", page("admin/packages", "Packages", { active: "packages" }));
+// ---- Package pages (HTML only) ----
+router.get("/admin/packages", (req, res) => res.redirect("/admin/package")); // keeps old links working
+
+router.get(
+  "/admin/package",
+  page("admin/packages", "Packages | BhajanKirtan", { active: "packages" })
+);
+
+router.get("/admin/package/:packageId", (req, res) =>
+  res.render("admin/package-detail", {
+    title: "Package | BhajanKirtan",
+    active: "packages",
+    packageId: req.params.packageId,
+  })
+);
 router.get("/admin/pricing", page("admin/pricing", "Pricing", { active: "pricing" }));
 
 export default router;

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %></title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/css/admin-dashboard.css">
+  <link rel="stylesheet" href="/css/admin-performers.css">
+  <link rel="stylesheet" href="/css/admin-packages.css">
+</head>
+<body>
+
+  <%- include("../partials/admin-header") %>
+
+  <main class="pf-page">
+    <div class="admin-wrap">
+
+      <div class="pf-head">
+        <h1>Packages</h1>
+        <span class="pf-count" id="pkCount"></span>
+      </div>
+
+      <div class="pf-state" id="pkLoading">Loading packages...</div>
+      <div class="pf-state pf-error" id="pkError" hidden></div>
+      <div class="pf-state" id="pkEmpty" hidden>No packages found.</div>
+
+      <div class="pf-list" id="pkList"></div>
+    </div>
+
+    <a href="/admin/package/new" class="pf-fab">+ Add Package</a>
+    <div class="pf-toast" id="pfToast" role="status" aria-live="polite"></div>
+  </main>
+
+  <%- include("../partials/admin-footer") %>
+
+  <script src="/js/admin-packages.js"></script>
+</body>
+</html>

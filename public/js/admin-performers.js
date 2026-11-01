@@ -147,10 +147,12 @@
 
       fillDatalists();
       render();
+      showToast(result.message || "Performers fetched successfully");
     } catch (error) {
       $("pfLoading").hidden = true;
       $("pfError").hidden = false;
       $("pfError").textContent = error.message || "Unable to load performers.";
+      showToast(error.message || "Unable to load performers.", true);
     }
   };
 

@@ -1,0 +1,32 @@
+/* list rows (no avatar, so two columns instead of three) */
+.pf-row.pk-row { grid-template-columns: 1fr auto; }
+
+.pk-top { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 16px; }
+.pk-price { font-family: "Rozha One", serif; color: var(--crimson-light); font-size: 1.5rem; line-height: 1; }
+.pk-desc {
+  color: var(--muted); font-size: .92rem; margin: 6px 0 10px;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.pk-feats { display: flex; flex-wrap: wrap; gap: 6px; }
+.pk-feat { font-size: .78rem; font-weight: 600; background: #f8e9c6; color: var(--crimson); padding: 2px 12px; border-radius: 999px; }
+.pk-feat.more { background: transparent; border: 1px dashed var(--gold); }
+
+/* detail page */
+.pk-hero {
+  display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px;
+  background: var(--paper); border: 3px double var(--gold); border-radius: 16px;
+  padding: 28px; margin-bottom: 22px;
+}
+.pk-hero h2 { font-family: "Rozha One", serif; font-weight: 400; color: var(--crimson); font-size: 2.1rem; line-height: 1.15; margin-bottom: 8px; }
+.pk-hero .pk-price { font-size: 2.4rem; }
+.pk-hero small { display: block; color: var(--muted); font-size: .8rem; text-transform: uppercase; letter-spacing: .6px; margin-bottom: 4px; }
+
+.pk-feature-list { list-style: none; }
+.pk-feature-list li { padding: 8px 0; border-bottom: 1px dashed var(--line); }
+.pk-feature-list li:last-child { border-bottom: 0; }
+.pk-feature-list li::before { content: "❀"; color: var(--marigold); margin-right: 10px; }
+
+@media (max-width: 720px) {
+  .pf-row.pk-row { grid-template-columns: 1fr; }
+  .pk-hero { text-align: center; justify-content: center; }
+}

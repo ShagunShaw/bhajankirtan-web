@@ -23,19 +23,6 @@
       ? url.replace("/upload/", `/upload/${transform}/`)
       : url;
 
-  const youtubeId = (link) => {
-    try {
-      const u = new URL(link);
-      if (u.hostname.includes("youtu.be")) return u.pathname.slice(1) || null;
-      if (u.hostname.includes("youtube.com")) {
-        if (u.searchParams.get("v")) return u.searchParams.get("v");
-        const m = u.pathname.match(/\/(embed|shorts)\/([^/]+)/);
-        return m ? m[2] : null;
-      }
-    } catch { /* not a valid URL */ }
-    return null;
-  };
-
   const apiRequest = async (url) => {
     const response = await fetch(url, {
       credentials: "same-origin",
@@ -60,6 +47,16 @@
     return result;
   };
 
+  let toastTimer;
+const showToast = (message, isError = false) => {
+  const t = $("pfToast");
+  t.textContent = message;
+  t.classList.toggle("error", isError);
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove("show"), 3000);
+};
+
   const photoTile = (src) =>
     isUrl(src)
       ? `<a class="pd-photo-tile" href="${escapeHTML(src)}" target="_blank" rel="noopener">
@@ -68,19 +65,20 @@
       : `<div class="pd-photo-tile">Not a valid image link:<br>${escapeHTML(src)}</div>`;
 
   const videoTile = (link) => {
-    const yt = youtubeId(link);
-    if (yt) {
-      return `<div class="pd-video">
-        <iframe src="https://www.youtube.com/embed/${encodeURIComponent(yt)}" loading="lazy"
-          title="Work video" allowfullscreen
-          allow="accelerometer; encrypted-media; gyroscope; picture-in-picture"></iframe>
-      </div>`;
-    }
-    if (isUrl(link) && /res\.cloudinary\.com|\.(mp4|webm|mov)(\?|$)/i.test(link)) {
-      return `<div class="pd-video"><video controls preload="metadata" src="${escapeHTML(link)}"></video></div>`;
-    }
-    return `<div class="pd-photo-tile"><a href="${escapeHTML(link)}" target="_blank" rel="noopener">${escapeHTML(link)}</a></div>`;
-  };
+  if (!isUrl(link)) {
+    return `<div class="pd-photo-tile">Not a valid video link:<br>${escapeHTML(link)}</div>`;
+  }
+  // Cloudinary can give us a still frame of the video to use as the poster.
+  const poster = /res\.cloudinary\.com/.test(link) && link.includes("/upload/")
+    ? link.replace("/upload/", "/upload/so_0,w_640,q_auto/").replace(/\.[a-z0-9]+(\?.*)?$/i, ".jpg")
+    : "";
+
+  return `<div class="pd-video">
+    <video controls preload="metadata" playsinline
+      ${poster ? `poster="${escapeHTML(poster)}"` : ""}
+      src="${escapeHTML(link)}"></video>
+  </div>`;
+};
 
   const render = (p) => {
     const hidden = p.visibility === "hidden";
@@ -152,15 +150,17 @@
   }, true);
 
   (async () => {
-    try {
-      const result = await apiRequest(`/admin/actions/performer/${encodeURIComponent(performerId)}`);
-      render(result.data);
-    } catch (error) {
-      $("pdLoading").hidden = true;
-      $("pdError").hidden = false;
-      $("pdError").textContent = error.message || "Unable to load this performer.";
-    }
-  })();
+  try {
+    const result = await apiRequest(`/admin/actions/performer/${encodeURIComponent(performerId)}`);
+    render(result.data);
+    showToast(result.message || "Performer details fetched successfully");
+  } catch (error) {
+    $("pdLoading").hidden = true;
+    $("pdError").hidden = false;
+    $("pdError").textContent = error.message || "Unable to load this performer.";
+    showToast(error.message || "Unable to load this performer.", true);
+  }
+})();
 
   // "Edit Performer" (#editPerformerBtn) intentionally has no action yet.
 })();
