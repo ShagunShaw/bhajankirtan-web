@@ -432,6 +432,59 @@ router.post("/admin/actions/reallot/:bookingId", (req, res) =>
 );
 
 router.get("/admin/bookings", page("admin/bookings", "Bookings", { active: "bookings" }));
+
+// Initial bookings list
+router.get("/admin/bookings/data", async (req, res) => {
+  try {
+    const base = WEB_ROUTE.replace(/\/+$/, "");
+    const query = new URLSearchParams(req.query).toString();
+
+    const response = await fetch(`${base}/booking/?${query}`, {
+      headers: {
+        Cookie: req.headers.cookie || "",
+        Accept: "application/json",
+      },
+    });
+
+    const setCookies = response.headers.getSetCookie?.() || [];
+    for (const cookie of setCookies) res.append("Set-Cookie", cookie);
+
+    return res.status(response.status).json(await response.json());
+  } catch (error) {
+    console.error("Bookings fetch failed:", error.message);
+    return res.status(502).json({
+      success: false,
+      errMessage: "Unable to load bookings. Please try again.",
+    });
+  }
+});
+
+// Filtered bookings search
+router.get("/admin/bookings/search", async (req, res) => {
+  try {
+    const base = WEB_ROUTE.replace(/\/+$/, "");
+    const query = new URLSearchParams(req.query).toString();
+
+    const response = await fetch(`${base}/booking/search?${query}`, {
+      headers: {
+        Cookie: req.headers.cookie || "",
+        Accept: "application/json",
+      },
+    });
+
+    const setCookies = response.headers.getSetCookie?.() || [];
+    for (const cookie of setCookies) res.append("Set-Cookie", cookie);
+
+    return res.status(response.status).json(await response.json());
+  } catch (error) {
+    console.error("Booking search failed:", error.message);
+    return res.status(502).json({
+      success: false,
+      errMessage: "Unable to search bookings. Please try again.",
+    });
+  }
+});
+
 router.get("/admin/performers", page("admin/performers", "Performers", { active: "performers" }));
 router.get("/admin/performers/new", page("admin/performer-new", "Add Performer", { active: "performers" }));
 router.get("/admin/performers/:id/edit", page("admin/performer-edit", "Edit Performer", { active: "performers" }));

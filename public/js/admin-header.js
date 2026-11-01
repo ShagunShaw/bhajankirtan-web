@@ -1,3 +1,33 @@
+// Client-side fallback to ensure the active nav link matches current URL path
+(() => {
+  const currentPath = window.location.pathname;
+  const links = document.querySelectorAll(".admin-links a");
+
+  links.forEach((link) => {
+    const href = link.getAttribute("href");
+    if (href && (currentPath === href || currentPath.startsWith(href + "/"))) {
+      link.classList.add("active");
+    } else if (href && currentPath !== href && !currentPath.startsWith(href + "/")) {
+      link.classList.remove("active");
+    }
+  });
+})();
+
+// Client-side fallback to ensure the active nav link matches current URL path
+(() => {
+  const currentPath = window.location.pathname;
+  const links = document.querySelectorAll(".admin-links a");
+
+  links.forEach((link) => {
+    const href = link.getAttribute("href");
+    if (href && (currentPath === href || currentPath.startsWith(href + "/"))) {
+      link.classList.add("active");
+    } else if (href && currentPath !== href && !currentPath.startsWith(href + "/")) {
+      link.classList.remove("active");
+    }
+  });
+})();
+
 document.getElementById("adminLogout")?.addEventListener("click", async () => {
   try {
     const response = await fetch("/api/admin/logout", {

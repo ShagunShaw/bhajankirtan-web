@@ -5,12 +5,12 @@
     </a>
 
     <nav class="admin-links">
-      <a href="/admin/dashboard" class="active">Dashboard</a>
-      <a href="/admin/bookings">Bookings</a>
-      <a href="/admin/performers">Performers</a>
-      <a href="/admin/packages">Packages</a>
-      <a href="/admin/pricing">Peak Prices</a>
-      <a href="/admin/tags">Tags</a>
+      <a href="/admin/dashboard" class="<%= (typeof active !== 'undefined' && active === 'dashboard') ? 'active' : '' %>">Dashboard</a>
+      <a href="/admin/bookings" class="<%= (typeof active !== 'undefined' && active === 'bookings') ? 'active' : '' %>">Bookings</a>
+      <a href="/admin/performers" class="<%= (typeof active !== 'undefined' && active === 'performers') ? 'active' : '' %>">Performers</a>
+      <a href="/admin/packages" class="<%= (typeof active !== 'undefined' && active === 'packages') ? 'active' : '' %>">Packages</a>
+      <a href="/admin/pricing" class="<%= (typeof active !== 'undefined' && active === 'pricing') ? 'active' : '' %>">Peak Prices</a>
+      <a href="/admin/tags" class="<%= (typeof active !== 'undefined' && active === 'tags') ? 'active' : '' %>">Tags</a>
     </nav>
 
     <button type="button" class="admin-logout" id="adminLogout">

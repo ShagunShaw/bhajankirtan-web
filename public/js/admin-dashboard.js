@@ -340,7 +340,7 @@
         ? `
           <div class="form-section">
             <h3>Allot Performers</h3>
-            <p class="field-help">Package allotments are compulsory.</p>
+            <p class="field-help">Performers allotments are compulsory for package confirmation</p>
             <div id="confirmAllotments"></div>
             <button type="button" class="btn btn-add-row" id="addConfirmAllotment">
               + Add Performer
