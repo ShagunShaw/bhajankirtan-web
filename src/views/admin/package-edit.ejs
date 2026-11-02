@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title><%= title %></title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rozha+One&family=Mukta:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="/css/admin-dashboard.css">
+  <link rel="stylesheet" href="/css/admin-performers.css">
+  <link rel="stylesheet" href="/css/admin-packages.css">
+</head>
+<body>
+
+  <%- include("../partials/admin-header") %>
+
+  <main class="pf-page" id="peRoot" data-package-id="<%= packageId %>">
+    <div class="admin-wrap">
+      <a href="/admin/package/<%= packageId %>" class="pf-back">← Back to package</a>
+
+      <div class="pf-head">
+        <h1>Edit Package</h1>
+        <span class="pf-count">Change only the fields you want to update</span>
+      </div>
+
+      <div class="pf-state" id="peLoading">Loading package...</div>
+      <div class="pf-state pf-error" id="peError" hidden></div>
+
+      <form id="peForm" class="pn-form" novalidate autocomplete="off" hidden>
+
+        <section class="pd-card">
+          <h3>Basic details</h3>
+          <div class="pn-grid">
+            <div class="pf-field pn-full">
+              <label for="packageName">Package name</label>
+              <input id="packageName" type="text" maxlength="120">
+              <small class="pn-err" id="err-packageName"></small>
+            </div>
+
+            <div class="pf-field">
+              <label for="price">Price (₹)</label>
+              <input id="price" type="number" min="1" step="1" inputmode="numeric">
+              <small class="pn-err" id="err-price"></small>
+            </div>
+
+            <div class="pf-field">
+              <label for="visibility">Visibility</label>
+              <select id="visibility">
+                <option value="visible">Visible</option>
+                <option value="hidden">Hidden</option>
+              </select>
+            </div>
+
+            <div class="pf-field pn-full">
+              <label for="description">Description</label>
+              <textarea id="description" rows="4" maxlength="2000"></textarea>
+            </div>
+          </div>
+        </section>
+
+        <section class="pd-card">
+          <h3>What's included</h3>
+          <div class="pn-tagbox" id="featBox">
+            <span id="featChips"></span>
+            <input id="featInput" type="text" placeholder="Type a feature and press Enter" aria-label="Add feature">
+          </div>
+          <small class="pn-hint">Press Enter to add each feature. At least one is required.</small>
+          <small class="pn-err" id="err-features"></small>
+        </section>
+
+        <section class="pd-card">
+          <h3>Work photos <span class="pn-count" id="photoCount">0 / 8</span></h3>
+          <input id="photoInput" type="file" accept="image/*" multiple hidden>
+          <button type="button" class="pf-btn pf-btn-line" id="photoPick">+ Add photos</button>
+          <div class="pn-thumbs" id="photoGrid"></div>
+        </section>
+
+        <section class="pd-card">
+          <h3>Work videos <span class="pn-count" id="videoCount">0 / 3</span></h3>
+          <input id="videoInput" type="file" accept="video/*" multiple hidden>
+          <button type="button" class="pf-btn pf-btn-line" id="videoPick">+ Add videos</button>
+          <ul class="pn-files" id="videoList"></ul>
+        </section>
+
+        <div class="pn-progress" id="pnProgress" hidden>
+          <div class="pn-bar"><i id="pnBar"></i></div>
+          <span id="pnProgressText">Uploading… 0%</span>
+        </div>
+
+        <div class="pn-actions">
+          <a href="/admin/package/<%= packageId %>" class="pf-btn pf-btn-line pn-cancel">Cancel</a>
+          <button type="submit" class="pf-btn pf-btn-red" id="peSubmit">Edit</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="pf-toast" id="pfToast" role="status" aria-live="polite"></div>
+  </main>
+
+  <%- include("../partials/admin-footer") %>
+
+  <script src="/js/admin-package-edit.js"></script>
+</body>
+</html>

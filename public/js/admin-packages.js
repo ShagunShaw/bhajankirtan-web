@@ -82,6 +82,7 @@
             <input type="checkbox" data-toggle="${escapeHTML(id)}" ${hidden ? "checked" : ""}>
             <i></i>
           </label>
+          <button type="button" class="pf-del" data-delete="${escapeHTML(id)}">🗑 Delete</button>
         </div>
       </article>
     `;
@@ -119,7 +120,7 @@
   const list = $("pkList");
 
   const openRow = (target) => {
-    if (target.closest(".pf-switch")) return;
+    if (target.closest(".pf-switch, .pf-del")) return;
     const row = target.closest(".pf-row");
     if (row) window.location.href = `/admin/package/${encodeURIComponent(row.dataset.id)}`;
   };
@@ -168,6 +169,84 @@
       showToast(error.message || "Could not update visibility.", true);
     } finally {
       box.disabled = false;
+    }
+  });
+
+    // -------------------- Delete --------------------
+
+  const dialog = ({ icon, title, body, buttons, onEsc }) =>
+    new Promise((resolve) => {
+      const ov = document.createElement("div");
+      ov.className = "pf-modal-ov";
+      ov.innerHTML = `
+        <div class="pf-modal" role="alertdialog" aria-modal="true" aria-labelledby="pfModalTitle">
+          <div class="pf-modal-icon">${icon}</div>
+          <h2 id="pfModalTitle">${escapeHTML(title)}</h2>
+          <p>${escapeHTML(body)}</p>
+          <div class="pf-modal-actions">
+            ${buttons.map((b, i) => `<button type="button" class="pf-btn ${b.cls}" data-i="${i}">${escapeHTML(b.label)}</button>`).join("")}
+          </div>
+        </div>`;
+
+      const close = (value) => {
+        document.removeEventListener("keydown", onKey);
+        ov.remove();
+        resolve(value);
+      };
+      const onKey = (e) => { if (e.key === "Escape") close(onEsc); };
+
+      ov.addEventListener("click", (e) => {
+        const btn = e.target.closest("[data-i]");
+        if (btn) close(buttons[Number(btn.dataset.i)].value);
+      });
+      document.addEventListener("keydown", onKey);
+      document.body.appendChild(ov);
+      ov.querySelector(`[data-i="${buttons.findIndex((b) => b.focus)}"]`)?.focus();
+    });
+
+  const confirmDelete = (name) =>
+    dialog({
+      icon: "⚠️",
+      title: "Are you sure to delete?",
+      body: `"${name}" will be permanently deleted. This cannot be undone.`,
+      onEsc: false,
+      buttons: [
+        { label: "Cancel", cls: "pf-btn-line", value: false, focus: true },
+        { label: "Yes, delete", cls: "pf-btn-danger", value: true },
+      ],
+    });
+
+  const errorPopup = (message) =>
+    dialog({
+      icon: "❌",
+      title: "Deletion failed",
+      body: message,
+      onEsc: true,
+      buttons: [{ label: "OKK", cls: "pf-btn-red", value: true, focus: true }],
+    });
+
+  list.addEventListener("click", async (event) => {
+    const btn = event.target.closest(".pf-del");
+    if (!btn) return;
+
+    const id = btn.dataset.delete;
+    const pkg = state.all.find((p) => (p._id || p.id) === id);
+    if (!pkg) return;
+
+    if (!(await confirmDelete(pkg.packageName))) return;
+
+    btn.disabled = true;
+    btn.textContent = "Deleting…";
+
+    try {
+      const result = await apiRequest(`/admin/actions/package/${encodeURIComponent(id)}`, { method: "DELETE" });
+      state.all = state.all.filter((p) => (p._id || p.id) !== id);
+      render();
+      showToast(result.message || "Package deleted successfully.");
+    } catch (error) {
+      btn.disabled = false;
+      btn.textContent = "🗑 Delete";
+      await errorPopup(error.message || "Could not delete this package.");
     }
   });
 

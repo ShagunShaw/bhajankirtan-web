@@ -598,14 +598,76 @@ router.patch("/admin/actions/package/visibility/:packageId", (req, res) =>
   )
 );
 
+// Create package (multipart passthrough)
+router.post("/admin/actions/package", async (req, res) => {
+  try {
+    const base = WEB_ROUTE.replace(/\/+$/, "");
+    const response = await fetch(`${base}/package/`, {
+      method: "POST",
+      headers: {
+        Cookie: req.headers.cookie || "",
+        Accept: "application/json",
+        "Content-Type": req.headers["content-type"],
+      },
+      body: req,
+      duplex: "half",
+    });
+    const setCookies = response.headers.getSetCookie?.() || [];
+    for (const cookie of setCookies) res.append("Set-Cookie", cookie);
+    return res.status(response.status).json(await response.json());
+  } catch (error) {
+    console.error("Create package failed:", error.message);
+    return res.status(502).json({ success: false, errMessage: "Unable to connect to the server. Please try again." });
+  }
+});
+
+// Update package (multipart passthrough)
+router.patch("/admin/actions/package/:packageId", async (req, res) => {
+  try {
+    const base = WEB_ROUTE.replace(/\/+$/, "");
+    const response = await fetch(`${base}/package/${encodeURIComponent(req.params.packageId)}`, {
+      method: "PATCH",
+      headers: {
+        Cookie: req.headers.cookie || "",
+        Accept: "application/json",
+        "Content-Type": req.headers["content-type"],
+      },
+      body: req,
+      duplex: "half",
+    });
+    const setCookies = response.headers.getSetCookie?.() || [];
+    for (const cookie of setCookies) res.append("Set-Cookie", cookie);
+    return res.status(response.status).json(await response.json());
+  } catch (error) {
+    console.error("Update package failed:", error.message);
+    return res.status(502).json({ success: false, errMessage: "Unable to connect to the server. Please try again." });
+  }
+});
+
+// Delete package
+router.delete("/admin/actions/package/:packageId", (req, res) =>
+  forwardAdminApi(req, res, `/package/${encodeURIComponent(req.params.packageId)}`)
+);
+
 router.get("/admin/performers", page("admin/performers", "Performers", { active: "performers" }));
 router.get("/admin/performers/new", page("admin/performer-new", "Add Performer", { active: "performers" }));
+
 // ---- Package pages (HTML only) ----
 router.get("/admin/packages", (req, res) => res.redirect("/admin/package")); // keeps old links working
 
 router.get(
   "/admin/package",
   page("admin/packages", "Packages | BhajanKirtan", { active: "packages" })
+);
+
+router.get("/admin/package/new", page("admin/package-new", "Add Package | BhajanKirtan", { active: "packages" }));
+
+router.get("/admin/package/:packageId/edit", (req, res) =>
+  res.render("admin/package-edit", {
+    title: "Edit Package | BhajanKirtan",
+    active: "packages",
+    packageId: req.params.packageId,
+  })
 );
 
 router.get("/admin/package/:packageId", (req, res) =>

@@ -149,5 +149,7 @@
     }
   })();
 
-  // "Edit Package" (#editPackageBtn) intentionally has no action yet.
+    $("editPackageBtn").addEventListener("click", () => {
+    window.location.href = `/admin/package/${encodeURIComponent(packageId)}/edit`;
+  });
 })();
