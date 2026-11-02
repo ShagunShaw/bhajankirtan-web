@@ -508,6 +508,76 @@ router.patch("/admin/actions/performer/visibility/:performerId", (req, res) =>
   )
 );
 
+// Delete performer -> DELETE WEB_ROUTE/performer/:performerId
+router.delete("/admin/actions/performer/:performerId", (req, res) =>
+  forwardAdminApi(req, res, `/performer/${encodeURIComponent(req.params.performerId)}`)
+);
+
+router.get("/admin/performers/:id/edit", (req, res) =>
+  res.render("admin/performer-edit", {
+    title: "Edit Performer | BhajanKirtan",
+    active: "performers",
+    performerId: req.params.id,
+  })
+);
+
+// Update performer: streams the multipart body straight to the backend.
+router.patch("/admin/actions/performer/:performerId", async (req, res) => {
+  try {
+    const base = WEB_ROUTE.replace(/\/+$/, "");
+    const response = await fetch(`${base}/performer/${encodeURIComponent(req.params.performerId)}`, {
+      method: "PATCH",
+      headers: {
+        Cookie: req.headers.cookie || "",
+        Accept: "application/json",
+        "Content-Type": req.headers["content-type"],
+      },
+      body: req,
+      duplex: "half",
+    });
+
+    const setCookies = response.headers.getSetCookie?.() || [];
+    for (const cookie of setCookies) res.append("Set-Cookie", cookie);
+
+    return res.status(response.status).json(await response.json());
+  } catch (error) {
+    console.error("Update performer failed:", error.message);
+    return res.status(502).json({
+      success: false,
+      errMessage: "Unable to connect to the server. Please try again.",
+    });
+  }
+});
+
+// Create performer: streams the multipart body straight to the backend.
+router.post("/admin/actions/performer", async (req, res) => {
+  try {
+    const base = WEB_ROUTE.replace(/\/+$/, "");
+
+    const response = await fetch(`${base}/performer/`, {
+      method: "POST",
+      headers: {
+        Cookie: req.headers.cookie || "",
+        Accept: "application/json",
+        "Content-Type": req.headers["content-type"],
+      },
+      body: req,
+      duplex: "half",
+    });
+
+    const setCookies = response.headers.getSetCookie?.() || [];
+    for (const cookie of setCookies) res.append("Set-Cookie", cookie);
+
+    return res.status(response.status).json(await response.json());
+  } catch (error) {
+    console.error("Create performer failed:", error.message);
+    return res.status(502).json({
+      success: false,
+      errMessage: "Unable to connect to the server. Please try again.",
+    });
+  }
+});
+
 // ---- Package data (forwarded to backend with the admin cookie) ----
 // All packages -> GET WEB_ROUTE/package/
 router.get("/admin/actions/packages", (req, res) =>
@@ -530,7 +600,6 @@ router.patch("/admin/actions/package/visibility/:packageId", (req, res) =>
 
 router.get("/admin/performers", page("admin/performers", "Performers", { active: "performers" }));
 router.get("/admin/performers/new", page("admin/performer-new", "Add Performer", { active: "performers" }));
-router.get("/admin/performers/:id/edit", page("admin/performer-edit", "Edit Performer", { active: "performers" }));
 // ---- Package pages (HTML only) ----
 router.get("/admin/packages", (req, res) => res.redirect("/admin/package")); // keeps old links working
 

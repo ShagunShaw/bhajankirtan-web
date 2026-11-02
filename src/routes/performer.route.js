@@ -12,8 +12,7 @@ router.get("/:performerId", verifyJWT, performerController.getPerformerById);   
 
 router.patch("/visibility/:performerId", verifyJWT, performerController.togglePerformerVisibility);     // Checked
 
-// Check once ki yh textual data toh properly update krra h, but for binary data, wo properly update hora h ki ni
-router.patch("/:performerId", verifyJWT, uploadPerformerMedia, performerController.updatePerformer);       
+router.patch("/:performerId", verifyJWT, uploadPerformerMedia, performerController.updatePerformer);       // Checked
 
 router.delete("/:performerId", verifyJWT, performerController.deletePerformer);      
 

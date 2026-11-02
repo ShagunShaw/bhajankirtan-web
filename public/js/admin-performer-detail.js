@@ -162,5 +162,7 @@ const showToast = (message, isError = false) => {
   }
 })();
 
-  // "Edit Performer" (#editPerformerBtn) intentionally has no action yet.
+    $("editPerformerBtn").addEventListener("click", () => {
+    window.location.href = `/admin/performers/${encodeURIComponent(performerId)}/edit`;
+  });
 })();
