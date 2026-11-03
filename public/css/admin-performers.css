@@ -171,3 +171,12 @@
 .pf-modal h2 { font-size: 1.5rem; margin-bottom: 8px; }
 .pf-modal p { color: var(--muted); margin-bottom: 20px; word-break: break-word; }
 .pf-modal-actions { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
+
+/* tag suggestions */
+.pn-tagbox { position: relative; }
+.pn-sug { position: absolute; left: 0; right: 0; top: 100%; margin-top: 4px; background: #fff; border: 1.5px solid var(--gold); border-radius: 8px; z-index: 10; box-shadow: 0 10px 24px rgba(0,0,0,.18); overflow: hidden; }
+.pn-sug button { display: block; width: 100%; text-align: left; font: inherit; padding: 8px 12px; border: 0; background: transparent; color: var(--text); cursor: pointer; }
+.pn-sug button:hover, .pn-sug button.active { background: #f8e9c6; }
+.pn-sug-new { padding: 8px 12px; font-size: .85rem; color: var(--muted); border-top: 1px dashed var(--line); }
+.pn-sug button + .pn-sug-new { border-top: 1px dashed var(--line); }
+.pn-sug-new:first-child { border-top: 0; }

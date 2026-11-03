@@ -431,6 +431,10 @@ router.post("/admin/actions/reallot/:bookingId", (req, res) =>
   )
 );
 
+router.get("/admin/actions/tags", (req, res) =>
+  forwardAdminApi(req, res, "/admin/tags")
+);
+
 router.get("/admin/bookings", page("admin/bookings", "Bookings", { active: "bookings" }));
 
 // Initial bookings list
@@ -652,6 +656,22 @@ router.delete("/admin/actions/package/:packageId", (req, res) =>
 // All pricing data -> GET WEB_ROUTE/price/
 router.get("/admin/actions/prices", (req, res) =>
   forwardAdminApi(req, res, "/price/")
+);
+
+// Base price -> PATCH WEB_ROUTE/price/basePrice/:performerId
+router.patch("/admin/actions/price/basePrice/:performerId", (req, res) =>
+  forwardAdminApi(req, res, `/price/basePrice/${encodeURIComponent(req.params.performerId)}`)
+);
+
+// Peak price: create, update, delete
+router.post("/admin/actions/price/peakPrice", (req, res) =>
+  forwardAdminApi(req, res, "/price/peakPrice")
+);
+router.patch("/admin/actions/price/peakPrice/:id", (req, res) =>
+  forwardAdminApi(req, res, `/price/peakPrice/${encodeURIComponent(req.params.id)}`)
+);
+router.delete("/admin/actions/price/peakPrice/:id", (req, res) =>
+  forwardAdminApi(req, res, `/price/peakPrice/${encodeURIComponent(req.params.id)}`)
 );
 
 router.get("/admin/performers", page("admin/performers", "Performers", { active: "performers" }));

@@ -85,18 +85,142 @@
     if (state.tags.length) setError("tags", "");
   };
 
+    // ---- Tag suggestions ----
+
+  let knownTags = [];
+  let sugIndex = -1;
+  let sugItems = [];
+
+  const sugList = document.createElement("div");
+  sugList.className = "pn-sug";
+  sugList.hidden = true;
+  $("tagBox").appendChild(sugList);
+
+  const normTag = (s) => String(s).toLowerCase().replace(/[_\-\s]+/g, " ").trim();
+
+  const lev = (a, b) => {
+    const dp = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+    for (let j = 1; j <= b.length; j++) dp[0][j] = j;
+    for (let i = 1; i <= a.length; i++)
+      for (let j = 1; j <= b.length; j++)
+        dp[i][j] = Math.min(
+          dp[i - 1][j] + 1,
+          dp[i][j - 1] + 1,
+          dp[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1)
+        );
+    return dp[a.length][b.length];
+  };
+
+  const score = (q, tag) => {
+    const n = normTag(tag);
+    if (n === q) return 100;
+    if (n.startsWith(q)) return 90;
+    const words = n.split(" ");
+    if (words.some((w) => w.startsWith(q))) return 80;
+    if (n.includes(q)) return 70;
+    const allowed = q.length >= 7 ? 2 : q.length >= 4 ? 1 : 0;
+    if (!allowed) return 0;
+    const best = Math.min(...words.map((w) => lev(q, w)), lev(q, n));
+    return best <= allowed ? 50 - best * 10 : 0;
+  };
+
+  const hideSug = () => { sugList.hidden = true; sugIndex = -1; sugItems = []; };
+
+  const paintSug = () => {
+    sugList.querySelectorAll("button").forEach((b, i) => b.classList.toggle("active", i === sugIndex));
+  };
+
+  const showSug = () => {
+    const raw = $("tagInput").value.trim();
+    const q = normTag(raw);
+    if (!q) return hideSug();
+
+    const taken = new Set(state.tags.map((t) => normTag(t)));
+    sugItems = knownTags
+      .filter((t) => !taken.has(normTag(t)))
+      .map((t) => ({ t, s: score(q, t) }))
+      .filter((x) => x.s > 0)
+      .sort((a, b) => b.s - a.s || a.t.localeCompare(b.t))
+      .slice(0, 6)
+      .map((x) => x.t);
+
+    const isExact = knownTags.some((t) => normTag(t) === q);
+    sugIndex = -1;
+
+    sugList.innerHTML =
+      sugItems.map((t, i) => `<button type="button" data-pick="${i}">${escapeHTML(t)}</button>`).join("") +
+      (isExact || taken.has(q)
+        ? ""
+        : `<div class="pn-sug-new">Press Enter to add "<b>${escapeHTML(raw)}</b>" as a new tag</div>`);
+
+    sugList.hidden = !sugList.innerHTML;
+  };
+
+  const pickSug = (i) => {
+    if (!sugItems[i]) return;
+    addTags(sugItems[i]);
+    $("tagInput").value = "";
+    hideSug();
+    $("tagInput").focus();
+  };
+
+  $("tagInput").addEventListener("input", showSug);
+
   $("tagInput").addEventListener("keydown", (e) => {
     const input = e.target;
-    if (e.key === "Enter" || e.key === ",") {
+
+    if (e.key === "ArrowDown" && sugItems.length) {
       e.preventDefault();
+      sugIndex = (sugIndex + 1) % sugItems.length;
+      paintSug();
+    } else if (e.key === "ArrowUp" && sugItems.length) {
+      e.preventDefault();
+      sugIndex = sugIndex <= 0 ? sugItems.length - 1 : sugIndex - 1;
+      paintSug();
+    } else if (e.key === "Escape") {
+      hideSug();
+    } else if (e.key === "Enter" || e.key === ",") {
+      e.preventDefault();
+      if (e.key === "Enter" && sugIndex >= 0) return pickSug(sugIndex);
       addTags(input.value);
       input.value = "";
+      hideSug();
     } else if (e.key === "Backspace" && !input.value && state.tags.length) {
       state.tags.pop();
       renderTags();
     }
   });
-  $("tagInput").addEventListener("blur", (e) => { addTags(e.target.value); e.target.value = ""; });
+
+  // mousedown (not click) so the input doesn't blur and add the half-typed text first
+  sugList.addEventListener("mousedown", (e) => {
+    const btn = e.target.closest("[data-pick]");
+    if (!btn) return;
+    e.preventDefault();
+    pickSug(Number(btn.dataset.pick));
+  });
+
+  $("tagInput").addEventListener("blur", (e) => {
+    addTags(e.target.value);
+    e.target.value = "";
+    hideSug();
+  });
+
+  // Load existing tags once. If this fails the field still works, just without suggestions.
+  (async () => {
+    try {
+      const res = await fetch("/admin/actions/tags", {
+        credentials: "same-origin",
+        headers: { Accept: "application/json" },
+      });
+      const result = await res.json();
+      if (!res.ok || result.success === false) return;
+      const raw = Array.isArray(result.data) ? result.data : result.data?.tags || [];
+      knownTags = [...new Set(
+        raw.map((t) => (typeof t === "string" ? t : t.name || t.displayName)).filter(Boolean)
+      )];
+    } catch { /* suggestions are optional */ }
+  })();
+  
   $("tagBox").addEventListener("click", (e) => {
     const rm = e.target.closest("[data-rm]");
     if (rm) { state.tags.splice(Number(rm.dataset.rm), 1); renderTags(); return; }
