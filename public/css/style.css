@@ -1070,3 +1070,49 @@ body.booking-modal-open {
 .booking-response-details strong {
   color: var(--crimson, #b42335);
 }
+
+/* performer photo inside arch */
+.perf .arch { overflow: hidden; }
+.perf .arch img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.peak-label { display: inline-block; margin-left: 6px; font-size: .74rem; font-weight: 700; color: #8a5a00; background: #fff3d0; border: 1px solid var(--gold); padding: 1px 10px; border-radius: 999px; }
+
+/* package photo fan */
+.fan { position: relative; height: 190px; margin: 6px 0 18px; }
+.fan-card { position: absolute; left: 50%; bottom: 0; width: 112px; height: 142px; padding: 5px; background: #fff; border-radius: 8px; box-shadow: 0 6px 16px rgba(0,0,0,.28); transform-origin: 50% 100%; transform: translateX(calc(-50% + var(--x))) rotate(var(--a)); transition: transform .3s; }
+.fan-card img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; display: block; }
+.pack:hover .fan-card { transform: translateX(calc(-50% + var(--x) * 1.3)) rotate(calc(var(--a) * 1.3)); }
+
+/* performer detail: tighter spacing */
+.performer-detail-page { display: flex; flex-direction: column; gap: 22px; padding-top: 24px; padding-bottom: 40px; }
+.performer-detail-page section { padding: 0; margin: 0; }
+.performer-detail-page .back-link { align-self: flex-start; }
+.performer-profile-info { display: flex; flex-direction: column; gap: 10px; }
+.performer-profile-info > * { margin: 0; }
+.performer-section h2, .performer-booking-cta h2 { margin: 0 0 10px; }
+.performer-section p, .performer-booking-cta p { margin: 0; }
+.performer-gallery, .performer-video-list, .peak-period-list { margin: 0; gap: 12px; }
+
+/* book button */
+.performer-detail-page .btn-primary { background: var(--crimson); color: var(--gold-soft); border: 2px solid var(--gold); transition: .2s; }
+.performer-detail-page .btn-primary:hover { background: var(--crimson-dark); box-shadow: 0 10px 24px rgba(40, 8, 14, .55); transform: translateY(-2px); }
+
+/* ===== package detail: spacing, hero card, book buttons ===== */
+.package-detail-page { display: flex; flex-direction: column; gap: 22px; padding-top: 24px; padding-bottom: 40px; }
+.package-detail-page section { padding: 0; margin: 0; }
+.package-detail-page .back-link { align-self: flex-start; margin-bottom: 0; }
+
+.package-detail-page .package-detail-hero { padding: 32px 36px; display: flex; flex-direction: column; gap: 10px; }
+.package-detail-hero > * { margin: 0; }
+.package-detail-hero .package-description { margin-bottom: 4px; }
+
+.package-detail-foot { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin-top: 12px; padding-top: 18px; border-top: 1px solid #eee; }
+.package-detail-foot .package-detail-price { margin: 0; padding: 0; border: 0; }
+
+.package-detail-page .package-detail-section { margin: 0; }
+.package-detail-section > h2, .package-booking-cta h2 { margin: 0 0 10px; }
+.package-features-grid, .package-gallery, .package-video-list { gap: 12px; }
+.package-detail-page .package-booking-cta { margin: 0; }
+
+.package-detail-page .btn-primary { background: var(--crimson); color: var(--gold-soft); border: 2px solid var(--gold); transition: .2s; }
+.package-detail-page .btn-primary:hover { background: var(--crimson-dark); box-shadow: 0 10px 24px rgba(40, 8, 14, .55); transform: translateY(-2px); }
+.package-detail-page .book-package-btn { width: auto; flex: 0 0 auto; margin-left: auto; padding: 12px 28px; }

@@ -1,11 +1,27 @@
 <%- include("../partials/header", { title: "BhajanKirtan | Book Devotional Artists" }) %>
 <%
+  const PERF_LIMIT = 8, PACK_LIMIT = 6;
   const grads = [
     "linear-gradient(160deg,#f59e0b,#b45309)", "linear-gradient(160deg,#9b1c32,#52091a)",
     "linear-gradient(160deg,#e07b00,#7a1022)", "linear-gradient(160deg,#c2410c,#7c2d12)"
   ];
   const inr = (n) => "₹" + Number(n || 0).toLocaleString("en-IN");
   const initial = (name = "") => name.replace(/^(Pt\.|Acharya|Shri|Shree)\s+/i, "").trim().charAt(0).toUpperCase();
+  const isUrl = (v) => /^https?:\/\//i.test(v || "");
+  const cld = (url, t) => /res\.cloudinary\.com/.test(url) && url.includes("/upload/") ? url.replace("/upload/", `/upload/${t}/`) : url;
+  const tagName = (t) => String(typeof t === "string" ? t : (t.displayName || t.name || "")).replace(/_/g, " ");
+
+  // today's date in IST as YYYY-MM-DD
+  const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Kolkata" });
+  const priceFor = (p) => {
+    const peak = (p.peakPeriods || []).find((x) => today >= String(x.from).slice(0, 10) && today <= String(x.to).slice(0, 10));
+    return peak ? { amount: peak.price, label: peak.label } : { amount: p.basePrice, label: "" };
+  };
+
+  const perfAll = performers || [];
+  const packAll = packages || [];
+  const perfShown = perfAll.slice(0, PERF_LIMIT);
+  const packShown = packAll.slice(0, PACK_LIMIT);
 %>
 
 <!-- HERO -->
@@ -50,15 +66,15 @@
       <div class="orn">❖</div>
       <p>Handpicked performers trusted by hundreds of families</p>
     </div>
-    <div class="g-perf">
-      <% if (!performers || !performers.length) { %>
+        <div class="g-perf">
+      <% if (!perfShown.length) { %>
         <p class="empty">Artists will appear here soon.</p>
       <% } %>
-      <% (performers || []).forEach((p, i) => { %>
-        <a href="/performers/<%= p._id %>" class="perf">
+      <% perfShown.forEach((p, i) => { const pr = priceFor(p); %>
+        <a href="/performers/<%= p.id || p._id %>" class="perf">
           <div class="arch" style="background:<%= grads[i % grads.length] %>">
-            <% if (p.profilePhoto) { %>
-              <img src="<%= p.profilePhoto %>" alt="<%= p.fullName %>" loading="lazy">
+            <% if (isUrl(p.profilePhoto)) { %>
+              <img src="<%= cld(p.profilePhoto, 'w_400,h_460,c_fill,g_face,q_auto,f_auto') %>" alt="<%= p.fullName %>" loading="lazy">
             <% } else { %>
               <%= initial(p.fullName) %>
             <% } %>
@@ -67,15 +83,20 @@
           <% if (p.experience) { %><div class="exp"><%= p.experience %> experience</div><% } %>
           <div class="tags">
             <% (p.tags || []).slice(0, 3).forEach((t) => { %>
-              <span class="tag"><%= t.displayName || t.name %></span>
+              <span class="tag"><%= tagName(t) %></span>
             <% }) %>
           </div>
-          <div class="price">From <b><%= inr(p.basePrice) %></b></div>
+          <div class="price">
+            From <b><%= inr(pr.amount) %></b>
+            <% if (pr.label) { %><span class="peak-label"><%= pr.label %></span><% } %>
+          </div>
           <span class="go">View &amp; Book</span>
         </a>
       <% }) %>
     </div>
-    <div class="center"><a href="/performers" class="btn btn-red">Load More Performers</a></div>
+    <% if (perfAll.length > PERF_LIMIT) { %>
+      <div class="center"><a href="/performers" class="btn btn-red">Load More Performers</a></div>
+    <% } %>
   </div>
 </section>
 
@@ -88,17 +109,28 @@
       <div class="orn" style="color:var(--gold-soft)">❖</div>
       <p>Artists, sound and setup in one simple booking</p>
     </div>
-    <div class="g-pack">
-      <% if (!packages || !packages.length) { %>
+        <div class="g-pack">
+      <% if (!packShown.length) { %>
         <p class="empty">Packages will appear here soon.</p>
       <% } %>
-      <% (packages || []).forEach((pkg, i) => { %>
+      <% packShown.forEach((pkg, i) => { const shots = (pkg.workPhotos || []).filter(isUrl).slice(0, 4); %>
         <div class="pack <%= i === 1 ? 'best' : '' %>">
           <% if (i === 1) { %><span class="stamp">MOST BOOKED</span><% } %>
+
+          <% if (shots.length) { %>
+            <div class="fan" aria-hidden="true">
+              <% shots.forEach((src, k) => { const mid = (shots.length - 1) / 2; %>
+                <div class="fan-card" style="--a:<%= (k - mid) * 12 %>deg; --x:<%= (k - mid) * 38 %>px; z-index:<%= k + 1 %>">
+                  <img src="<%= cld(src, 'w_260,h_320,c_fill,q_auto,f_auto') %>" alt="" loading="lazy">
+                </div>
+              <% }) %>
+            </div>
+          <% } %>
+
           <h3><%= pkg.packageName %></h3>
           <div class="amt"><%= inr(pkg.price) %> <small>onwards</small></div>
           <ul>
-            <% (pkg.inclusions || []).forEach((item) => { %>
+            <% (pkg.bulletFeatures || []).forEach((item) => { %>
               <li><%= item %></li>
             <% }) %>
           </ul>
@@ -106,7 +138,9 @@
         </div>
       <% }) %>
     </div>
-    <div class="center"><a href="/packages" class="btn btn-line">Load More Packages</a></div>
+    <% if (packAll.length > PACK_LIMIT) { %>
+      <div class="center"><a href="/packages" class="btn btn-line">Load More Packages</a></div>
+    <% } %>
   </div>
 </section>
 <div class="garland"></div>
