@@ -1,0 +1,41 @@
+.pr-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; align-items: start; }
+
+.pr-panel { background: var(--paper); border: 1.5px solid var(--line); border-top: 4px solid var(--gold); border-radius: 12px; display: flex; flex-direction: column; height: calc(100vh - 250px); min-height: 380px; overflow: hidden; }
+.pr-panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; border-bottom: 1.5px solid var(--line); background: var(--paper); }
+.pr-panel-head h2 { font-size: 1.35rem; }
+.pr-scroll { flex: 1; overflow-y: auto; padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
+
+.pr-empty { text-align: center; color: var(--muted); padding: 30px 10px; }
+
+/* base price row */
+.pr-base { display: flex; align-items: center; justify-content: space-between; gap: 12px; background: #fff; border: 1.5px solid var(--line); border-left: 5px solid var(--gold); border-radius: 10px; padding: 12px 14px; }
+.pr-name { font-family: "Rozha One", serif; color: var(--crimson); font-size: 1.1rem; line-height: 1.2; }
+.pr-amt { color: var(--crimson); font-weight: 700; font-size: 1.1rem; }
+.pr-base-side { display: flex; align-items: center; gap: 14px; }
+
+/* peak price card */
+.pr-peak { background: #fff; border: 1.5px solid var(--line); border-left: 5px solid var(--marigold); border-radius: 10px; padding: 12px 14px; display: flex; flex-direction: column; gap: 8px; }
+.pr-peak-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+.pr-label { color: var(--muted); font-size: .9rem; }
+.pr-dates { font-size: .88rem; color: var(--text); }
+.pr-peak-bottom { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+.pr-actions { display: flex; gap: 8px; }
+
+.pr-btn { font: inherit; font-size: .82rem; font-weight: 700; border-radius: 6px; padding: 4px 12px; cursor: pointer; background: transparent; transition: .2s; }
+.pr-edit { color: var(--crimson); border: 1.5px solid var(--crimson); }
+.pr-edit:hover { background: var(--crimson); color: var(--gold-soft); }
+.pr-del { color: #b42318; border: 1.5px solid #b42318; }
+.pr-del:hover { background: #b42318; color: #fff; }
+
+.pr-badge { font-size: .72rem; font-weight: 700; letter-spacing: .5px; text-transform: uppercase; padding: 3px 12px; border-radius: 999px; white-space: nowrap; }
+.pr-badge.active { background: #e7f6ec; color: #17673a; }
+.pr-badge.upcoming { background: #fff3d0; color: #8a5a00; }
+.pr-badge.ended { background: #eceaea; color: #5b4b4d; }
+
+@media (max-width: 900px) {
+  .pr-grid { grid-template-columns: 1fr; }
+  .pr-panel { height: 70vh; }
+}
+@media (max-width: 480px) {
+  .pr-panel-head { flex-wrap: wrap; }
+}

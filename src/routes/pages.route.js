@@ -649,6 +649,11 @@ router.delete("/admin/actions/package/:packageId", (req, res) =>
   forwardAdminApi(req, res, `/package/${encodeURIComponent(req.params.packageId)}`)
 );
 
+// All pricing data -> GET WEB_ROUTE/price/
+router.get("/admin/actions/prices", (req, res) =>
+  forwardAdminApi(req, res, "/price/")
+);
+
 router.get("/admin/performers", page("admin/performers", "Performers", { active: "performers" }));
 router.get("/admin/performers/new", page("admin/performer-new", "Add Performer", { active: "performers" }));
 
