@@ -44,45 +44,29 @@ const requireAdmin = async (req, res, next) => {
   }
 };
 
-/* Customer pages */
-router.get("/", async (req, res, next) => {
+const publicData = (backendPath) => async (req, res) => {
   try {
     const base = WEB_ROUTE.replace(/\/+$/, "");
-
-    // Fetch both APIs in parallel
-    const [performerRes, packageRes] = await Promise.all([
-      fetch(`${base}/default/`),
-      fetch(`${base}/default/packages`)
-    ]);
-
-    if (!performerRes.ok || !packageRes.ok) {
-      throw new Error("Failed to fetch homepage data");
-    }
-
-    const [performerResult, packageResult] = await Promise.all([
-      performerRes.json(),
-      packageRes.json()
-    ]);
-
-    if (!performerResult.success || !packageResult.success) {
-      throw new Error("API returned an unsuccessful response");
-    }
-
-    const performers = performerResult.data.performers || [];
-    const tags = performerResult.data.tags || [];
-    const packages = packageResult.data || [];
-
-    res.render("public/home", {
-      title: "BhajanKirtan | Book Devotional Artists",
-      performers,
-      tags,
-      packages
+    const response = await fetch(`${base}${backendPath}`, {
+      headers: { Accept: "application/json" },
+      signal: AbortSignal.timeout(10000),
     });
-  } catch (err) {
-    next(err);
+    res.set("Cache-Control", "no-store");
+    return res.status(response.status).json(await response.json());
+  } catch (error) {
+    console.error("Public data fetch failed:", error.message);
+    return res.status(502).json({ success: false, errMessage: "Unable to load data. Please try again." });
   }
-});
-router.get("/search", page("public/performers", "Find Performers"));      // This route is not JWT protected
+};
+
+/* Customer pages */
+router.get("/data/performers", publicData("/default/"));
+router.get("/data/packages", publicData("/default/packages"));
+
+router.get("/", page("public/home", "BhajanKirtan | Book Devotional Artists"));
+router.get("/search", page("public/performers", "Find Performers | BhajanKirtan"));
+router.get("/packages", page("public/packages", "Packages | BhajanKirtan"));
+
 router.get("/performers/:id", async (req, res, next) => {
   try {
     const base = WEB_ROUTE.replace(/\/+$/, "");

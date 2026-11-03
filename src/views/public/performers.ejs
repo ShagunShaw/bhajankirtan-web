@@ -1,0 +1,21 @@
+<%- include("../partials/header") %>
+
+<main class="wrap search-page">
+  <div class="search-top">
+    <h1>Find Performers</h1>
+    <form class="search search-bar" id="sForm" autocomplete="off">
+      <input id="sQ" type="text" placeholder="Search by artist name or tag" aria-label="Search performers">
+      <button type="submit">Search</button>
+    </form>
+        <div class="search-meta">
+      <p class="search-count" id="sCount"></p>
+      <button type="button" class="btn btn-line show-all" id="sAll" hidden>Show all performers</button>
+    </div>
+  </div>
+
+  <div class="srows" id="sList"><p class="empty">Loading artists…</p></div>
+</main>
+
+<script src="/js/utils/catalog.js"></script>
+<script src="/js/public/search.js"></script>
+<%- include("../partials/footer") %>
