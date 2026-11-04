@@ -1166,3 +1166,97 @@ a.pack { color: inherit; }
 .show-all { padding: 7px 20px; font-size: .88rem; }
 
 [hidden] { display: none !important; }
+
+/* ===== mobile: galleries ===== */
+@media (max-width: 600px) {
+  .performer-gallery,
+  .package-gallery { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
+  .gallery-item,
+  .package-gallery-item { border-radius: 8px; }
+}
+@media (max-width: 380px) {
+  .performer-gallery,
+  .package-gallery { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* ===== mobile: header ===== */
+@media (max-width: 600px) {
+  .nav { height: 60px; gap: 10px; }
+  .logo { font-size: 1.35rem; white-space: nowrap; }
+  nav { gap: 10px; }
+  nav a { font-size: .8rem; white-space: nowrap; }
+  nav .nav-cta { padding: 6px 12px; font-size: .78rem; white-space: nowrap; border-radius: 5px; }
+  .topbar { font-size: .72rem; padding: 6px 10px; }
+}
+
+/* ===== mobile: home ===== */
+.dots { display: none; }
+
+@media (max-width: 600px) {
+  /* event tags: one row */
+  .events { padding-top: 32px; }
+  .events .wrap { padding: 0 8px; }
+  .ev-row { flex-wrap: nowrap; justify-content: space-between; gap: 4px; }
+  .ev { width: auto; flex: 1 1 0; min-width: 0; }
+  .ev .ring { width: 48px; height: 48px; font-size: 1.2rem; margin-bottom: 6px; box-shadow: 0 0 0 3px var(--ivory), 0 0 0 4.5px var(--line); }
+  .ev b { font-size: .64rem; line-height: 1.2; display: block; }
+
+  /* performers: 2 per row, compact */
+  .g-perf { gap: 22px 10px; }
+  .perf h3 { font-size: 1.05rem; }
+  .perf .exp, .perf .price { font-size: .8rem; }
+  .perf .price b { font-size: 1rem; }
+  .perf .tag { font-size: .68rem; padding: 1px 9px; }
+  .perf .go { font-size: .8rem; }
+
+  /* packages: square cards in a looping slider */
+  .g-pack { --pw: min(78vw, 300px); display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory; padding: 20px calc((100vw - var(--pw)) / 2) 10px; margin: 0 -22px; scrollbar-width: none; }
+  .g-pack::-webkit-scrollbar { display: none; }
+  .g-pack .pack { flex: 0 0 var(--pw); width: var(--pw); aspect-ratio: 1 / 1; padding: 14px; scroll-snap-align: center; justify-content: space-between; overflow: hidden; }
+  .g-pack .pack:hover { transform: none; }
+  .g-pack .empty { flex: 1; }
+  .g-pack .fan { height: 84px; margin: 0 0 6px; }
+  .g-pack .fan-card { width: 58px; height: 74px; padding: 3px; transform: translateX(calc(-50% + var(--x) * .55)) rotate(var(--a)); }
+  .g-pack .pack h3 { font-size: 1.2rem; }
+  .g-pack .pack .amt { font-size: 1.5rem; margin: 2px 0 6px; }
+  .g-pack .pack ul { margin-bottom: 8px; overflow: hidden; }
+  .g-pack .pack li { padding: 3px 0; font-size: .8rem; }
+  .g-pack .pack li:nth-child(n+3) { display: none; }
+  .g-pack .pack .btn { padding: 8px 16px; font-size: .85rem; }
+
+  .dots { display: flex; justify-content: center; gap: 8px; margin-top: 4px; }
+  .dots i { width: 8px; height: 8px; border-radius: 50%; background: rgba(241,213,138,.4); cursor: pointer; transition: .2s; }
+  .dots i.on { background: var(--gold-soft); transform: scale(1.3); }
+}
+
+/* ===== mobile: package card height + hero overflow ===== */
+@media (max-width: 600px) {
+  /* hero: stop content from pushing the page wider than the screen */
+  html, body { overflow-x: hidden; }
+  .hero { padding: 40px 0 44px; }
+  .hero-grid { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+  .hero-grid > div { min-width: 0; }
+  .hero p.sub { max-width: 100%; }
+  .search { max-width: 100%; }
+  .search input { padding: 0 10px; font-size: .9rem; }
+  .search button { padding: 11px 16px; }
+  .pop { gap: 6px; }
+  .window { max-width: 190px; outline-offset: 5px; }
+
+  /* package card: taller, all bullets visible */
+  .g-pack .pack { aspect-ratio: auto; min-height: 400px; justify-content: flex-start; }
+  .g-pack .pack ul { flex: 1; margin-bottom: 12px; }
+  .g-pack .pack li:nth-child(n+3) { display: list-item; }
+  .g-pack .pack li:nth-child(n+5) { display: none; }
+}
+
+@media (max-width: 600px) {
+  .g-pack { padding-top: 34px; }
+}
+
+@media (max-width: 600px) {
+  .g-pack { padding-top: 40px !important; }
+  .g-pack .pack { overflow: visible !important; }
+  .g-pack .pack ul { overflow: hidden; }
+  .g-pack .stamp { top: -12px; z-index: 3; }
+}
